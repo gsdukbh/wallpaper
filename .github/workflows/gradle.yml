@@ -36,6 +36,8 @@ jobs:
           git add images/**
           git add index.txt
           git add *.json
+          git add *.md
+          git add *.db
           git commit -m "updata wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
