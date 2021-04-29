@@ -212,7 +212,8 @@ public class App {
         FileWriter fileWriter = new FileWriter(file);
 
         String readme = "# wallpaper \n" +
-                "bing wallpaper 4k download\n";
+                 "[![Java CI with Gradle](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml/badge.svg)](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml)"
+            +"bing wallpaper 4k download\n";
 
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         String url = getUrlBase(images.url);
