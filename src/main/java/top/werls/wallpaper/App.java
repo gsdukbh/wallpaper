@@ -16,8 +16,10 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -31,6 +33,9 @@ public class App {
     private static final String YING_URL = "https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth=" + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
 
     private static final String BASIS_URL = "https://cn.bing.com";
+
+    // 使用代理
+    private static final String CN_BING_URL = "https://rpi.werls.top/bing";
 
     public static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
 
@@ -62,6 +67,8 @@ public class App {
          * 版权信息
          */
         private String copyright;
+
+        private String copyrightCN;
         /**
          * hash 值
          */
@@ -73,8 +80,17 @@ public class App {
                     "endDate=" + endDate +
                     ", url='" + url + '\'' +
                     ", copyright='" + copyright + '\'' +
+                    ", copyrightCN='" + copyrightCN + '\'' +
                     ", hash='" + hash + '\'' +
                     '}';
+        }
+
+        public String getCopyrightCN() {
+            return copyrightCN;
+        }
+
+        public void setCopyrightCN(String copyrightCN) {
+            this.copyrightCN = copyrightCN;
         }
 
         public Date getEndDate() {
@@ -139,6 +155,15 @@ public class App {
         images.setUrl(jsonObject.getString("url"));
         images.setCopyright(jsonObject.getString("copyright"));
         images.setHash(jsonObject.getString("hsh"));
+        // 获取中文版权。
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header("User-Agent", USER_AGENT)
+                .uri(URI.create(CN_BING_URL))
+                .build();
+        HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JSONArray jsonArray = JSON.parseObject(response.body()).getJSONArray("images");
+        JSONObject object = jsonArray.getJSONObject(0);
+        images.setCopyrightCN(object.getString("copyright"));
         return images;
     }
 
@@ -158,7 +183,7 @@ public class App {
                 .build();
 
         // 原图
-        url = url.substring(0, url.indexOf("&"));
+        url = getUrlBase(url);
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header("User-Agent", USER_AGENT)
                 .uri(URI.create(BASIS_URL + url))
@@ -184,14 +209,54 @@ public class App {
     public static void writeMd(Images images) throws Exception {
         //
         File file = new File(README);
-        FileWriter fileWriter = new FileWriter(file, true);
+        FileWriter fileWriter = new FileWriter(file);
+
+        String readme = "# wallpaper \n" +
+                "bing wallpaper 4k download\n";
+
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-        String url = images.getUrl().substring(0, images.getUrl().indexOf("&"));
+        String url = getUrlBase(images.url);
+
         String md = "| ![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+                + fmt.format(images.getEndDate()) + "  " + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+
+        fileWriter.write(readme);
         fileWriter.write("\n");
         fileWriter.write(md);
+
+        String from = "|      |    |\n" +
+                "| :----: | :----: | ";
+        List<Images> imagesList = readerJson(getJsonName());
+
+        imagesList = imagesList.stream().sorted(Comparator.comparing(Images::getEndDate).reversed()).collect(Collectors.toList());
+
+        if (imagesList.size() > 0) {
+            fileWriter.write(from);
+            int count = 1;
+            for (Images i : imagesList) {
+                String tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
+                        + fmt.format(i.getEndDate()) + "  " + i.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+                fileWriter.write(tem);
+                count++;
+                if (count > 2) {
+                    count = 1;
+                    fileWriter.write("\n");
+                }
+            }
+        }
+
+//        imagesList.forEach(i -> {
+//            int count = 1 ;
+//            String  tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
+//                    + fmt.format(i.getEndDate()) + "  " + i.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+//
+//        });
+
         fileWriter.close();
+    }
+
+    public static String getUrlBase(String url) {
+        return url.substring(0, url.indexOf("&"));
     }
 
     /**
@@ -204,7 +269,7 @@ public class App {
     public static List<Images> readerJson(String filePath) throws Exception {
         File file = new File(filePath);
         if (!Files.exists(Path.of(filePath))) {
-            Files.createFile(Path.of(filePath));
+//            Files.createFile(Path.of(filePath));
             return new ArrayList<>();
         }
         FileReader reader = new FileReader(file);
@@ -213,6 +278,7 @@ public class App {
         jsonReader.startArray();
         if (jsonReader.hasNext()) {
             Images temp = jsonReader.readObject(Images.class);
+            images.add(temp);
         }
         jsonReader.endArray();
         jsonReader.close();
@@ -341,6 +407,7 @@ public class App {
                 fileName = 1 + JSON_NAME;
             }
             filePath = fileName;
+            writeToTxt(fileName);
             imagesList.clear();
             imagesList.add(images);
         }
