@@ -217,8 +217,8 @@ public class App {
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         String url = getUrlBase(images.url);
 
-        String md = "| ![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + "  " + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+        String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
+                + fmt.format(images.getEndDate()) + "  " + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") ";
 
         fileWriter.write(readme);
         fileWriter.write("\n");
