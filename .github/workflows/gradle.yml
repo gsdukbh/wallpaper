@@ -39,7 +39,7 @@ jobs:
           git add *.json
           git add *.md
           git add *.db
-          git commit -m "updata wallpaper"
+          git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
