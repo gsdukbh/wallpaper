@@ -6,8 +6,8 @@ name: Java CI with Gradle
 on:
   schedule:
     - cron: '0 0 * * *'
-#   push:
-#     branches: [ main ]
+   push:
+     branches: [ main ]
 #  pull_request:
 #    branches: [ main ]
 
@@ -33,7 +33,8 @@ jobs:
         run: |
           git config --local user.email "gsdukbh@gmail.com"
           git config --local user.name "JiaWei Lee"
-          git add images/**
+          git add images/4k_**
+          git add images/bing_**
           git add index.txt
           git add *.json
           git add *.md
