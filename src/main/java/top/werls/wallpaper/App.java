@@ -256,18 +256,22 @@ public class App {
         imagesList = imagesList.stream().sorted(Comparator.comparing(Images::getEndDate).reversed()).collect(Collectors.toList());
 
         if (imagesList.size() > 0) {
+            fileWriter.write("\n");
             fileWriter.write(from);
             fileWriter.write("\n");
-            int count = 1;
+            int count = 0;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-                        + fmt.format(i.getEndDate()) + "  " + i.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
+                        + fmt.format(i.getEndDate()) + " [ " + i.getCopyright() + "](" + BASIS_URL + url + ") ";
                 fileWriter.write(tem);
                 count++;
-                if (count > 2) {
-                    count = 1;
+                if (count % 2 == 0) {
+                    fileWriter.write("|");
                     fileWriter.write("\n");
                 }
+            }
+            if (count % 2 == 1) {
+                fileWriter.write("|");
             }
         }
 
@@ -302,7 +306,7 @@ public class App {
         JSONReader jsonReader = new JSONReader(reader);
         List<Images> images = new ArrayList<>();
         jsonReader.startArray();
-        if (jsonReader.hasNext()) {
+        while (jsonReader.hasNext()) {
             Images temp = jsonReader.readObject(Images.class);
             images.add(temp);
         }
@@ -447,5 +451,6 @@ public class App {
             imagesList.add(images);
         }
         writerJson(imagesList, filePath);
+
     }
 }
