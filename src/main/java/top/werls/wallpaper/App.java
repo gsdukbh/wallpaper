@@ -74,6 +74,10 @@ public class App {
          */
         private String hash;
 
+        private Date utcDate;
+
+        private String urlForeign;
+
         @Override
         public String toString() {
             return "Images{" +
@@ -82,7 +86,25 @@ public class App {
                     ", copyright='" + copyright + '\'' +
                     ", copyrightCN='" + copyrightCN + '\'' +
                     ", hash='" + hash + '\'' +
+                    ", utcDate=" + utcDate +
+                    ", urlForeign='" + urlForeign + '\'' +
                     '}';
+        }
+
+        public Date getUtcDate() {
+            return utcDate;
+        }
+
+        public void setUtcDate(Date utcDate) {
+            this.utcDate = utcDate;
+        }
+
+        public String getUrlForeign() {
+            return urlForeign;
+        }
+
+        public void setUrlForeign(String urlForeign) {
+            this.urlForeign = urlForeign;
         }
 
         public String getCopyrightCN() {
@@ -143,7 +165,7 @@ public class App {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .header("User-Agent", USER_AGENT)
-                .uri(URI.create(YING_URL))
+                .uri(URI.create(CN_BING_URL))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -153,17 +175,19 @@ public class App {
         DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         images.setEndDate(fmt.parse(jsonObject.getString("enddate")));
         images.setUrl(jsonObject.getString("url"));
-        images.setCopyright(jsonObject.getString("copyright"));
+        images.setCopyrightCN(jsonObject.getString("copyright"));
         images.setHash(jsonObject.getString("hsh"));
-        // 获取中文版权。
+        // 获取英文版权  因为时间差异 可能会不一样
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header("User-Agent", USER_AGENT)
-                .uri(URI.create(CN_BING_URL))
+                .uri(URI.create(YING_URL))
                 .build();
         HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
         JSONArray jsonArray = JSON.parseObject(response.body()).getJSONArray("images");
         JSONObject object = jsonArray.getJSONObject(0);
-        images.setCopyrightCN(object.getString("copyright"));
+        images.setCopyright(object.getString("copyright"));
+        images.setUrlForeign(jsonObject.getString("url"));
+        images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
         return images;
     }
 
@@ -218,10 +242,10 @@ public class App {
         String url = getUrlBase(images.url);
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + "  " + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") ";
+                + fmt.format(images.getEndDate()) + "  " + images.getCopyrightCN() + "  [ download ](" + BASIS_URL + url + ") ";
 
-        fileWriter.write("### 今天 today");
         fileWriter.write(readme);
+        fileWriter.write("### 今天 today :");
         fileWriter.write("\n");
         fileWriter.write(md);
 
@@ -321,19 +345,25 @@ public class App {
                 "  \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n" +
                 "  \"hash\" TEXT,\n" +
                 "  \"url\" TEXT,\n" +
-                "  \"copyright\" TEXT,\n" +
-                "  \"endDate\" DATE\n" +
+                "  \"urlForeign\" TEXT,\n" +
+                "  \"copyright\" TEXT,\n " +
+                "   \"copyrightCN\" TEXT,\n " +
+                "  \"endDate\" DATE\n," +
+                "  \"utcDate\" DATE\n" +
                 ")";
         Statement statement = connection.createStatement();
         statement.execute(dateBase);
         statement.close();
         // 保存
-        String sql = "INSERT INTO images(hash,url,copyright,endDate) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO images(hash,url,copyright,endDate,urlForeign,copyrightCN,utcDate) VALUES(?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, images.getHash());
         preparedStatement.setString(2, images.getUrl());
         preparedStatement.setString(3, images.getCopyright());
         preparedStatement.setDate(4, new java.sql.Date(images.getEndDate().getTime()));
+        preparedStatement.setString(5, images.getUrlForeign());
+        preparedStatement.setString(6, images.getCopyrightCN());
+        preparedStatement.setDate(7, new java.sql.Date(images.getUtcDate().getTime()));
         preparedStatement.execute();
         preparedStatement.close();
     }
@@ -355,8 +385,11 @@ public class App {
             Images images = new Images();
             images.setHash(resultSet.getString("hash"));
             images.setUrl(resultSet.getString("url"));
+            images.setUrlForeign(resultSet.getString("urlForeign"));
             images.setCopyright(resultSet.getString("copyright"));
             images.setEndDate(new Date(resultSet.getDate("endDate").getTime()));
+            images.setUtcDate(new Date(resultSet.getDate("utcDate").getTime()));
+            images.setCopyrightCN(resultSet.getString("copyrightCN"));
             list.add(images);
         }
         return list;
