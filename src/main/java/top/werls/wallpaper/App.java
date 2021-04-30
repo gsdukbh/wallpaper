@@ -30,7 +30,7 @@ public class App {
 
     private static final String UHD_WIDTH = "3840";
     private static final String UHD_HEIGHT = "2160";
-    private static final String YING_URL = "https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth=" + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
+    private static final String YING_URL = "https://bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth=" + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
 
     private static final String BASIS_URL = "https://cn.bing.com";
 
@@ -183,7 +183,7 @@ public class App {
                 .uri(URI.create(YING_URL))
                 .build();
         HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONArray jsonArray = JSON.parseObject(response.body()).getJSONArray("images");
+        JSONArray jsonArray = JSON.parseObject(httpResponse.body()).getJSONArray("images");
         JSONObject object = jsonArray.getJSONObject(0);
         images.setCopyright(object.getString("copyright"));
         images.setUrlForeign(jsonObject.getString("url"));
@@ -242,7 +242,7 @@ public class App {
         String url = getUrlBase(images.url);
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + "  " + images.getCopyrightCN() + "  [ download ](" + BASIS_URL + url + ") ";
+                + fmt.format(images.getEndDate()) + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") ";
 
         fileWriter.write(readme);
         fileWriter.write("### 今天 today :");
