@@ -211,9 +211,8 @@ public class App {
         File file = new File(README);
         FileWriter fileWriter = new FileWriter(file);
 
-        String readme = "# wallpaper \n" +
-                 "[![Java CI with Gradle](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml/badge.svg)](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml)"
-            +"bing wallpaper 4k download\n";
+        String readme = "# wallpaper \n" + "[![Java CI with Gradle](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml/badge.svg)](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml) \n"
+                + "bing wallpaper 4k download\n";
 
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         String url = getUrlBase(images.url);
@@ -221,6 +220,7 @@ public class App {
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
                 + fmt.format(images.getEndDate()) + "  " + images.getCopyright() + "  [ download ](" + BASIS_URL + url + ") ";
 
+        fileWriter.write("### 今天 today");
         fileWriter.write(readme);
         fileWriter.write("\n");
         fileWriter.write(md);
@@ -233,6 +233,7 @@ public class App {
 
         if (imagesList.size() > 0) {
             fileWriter.write(from);
+            fileWriter.write("\n");
             int count = 1;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
