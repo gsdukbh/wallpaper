@@ -242,7 +242,7 @@ public class App {
         String url = getUrlBase(images.url);
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + "  " + images.getCopyrightCN() + "  [ download ](" + BASIS_URL + url + ") ";
+                + fmt.format(images.getEndDate()) + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") ";
 
         fileWriter.write(readme);
         fileWriter.write("### 今天 today :");
