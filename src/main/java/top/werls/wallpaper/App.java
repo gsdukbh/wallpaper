@@ -182,7 +182,7 @@ public class App {
                 .header("User-Agent", USER_AGENT)
                 .uri(URI.create(YING_URL))
                 .build();
-        HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         JSONArray jsonArray = JSON.parseObject(httpResponse.body()).getJSONArray("images");
         JSONObject object = jsonArray.getJSONObject(0);
         images.setCopyright(object.getString("copyright"));
@@ -431,6 +431,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         Images images = getImages();
         downloadFile(images.getUrl());
+        
         saveToSqlite(images);
         writeMd(images);
         String filePath = getJsonName();
