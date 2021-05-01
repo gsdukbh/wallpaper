@@ -78,6 +78,10 @@ public class App {
 
         private String urlForeign;
 
+        private String fileName4k;
+
+        private String fileName;
+
         @Override
         public String toString() {
             return "Images{" +
@@ -88,7 +92,25 @@ public class App {
                     ", hash='" + hash + '\'' +
                     ", utcDate=" + utcDate +
                     ", urlForeign='" + urlForeign + '\'' +
+                    ", fileName4k='" + fileName4k + '\'' +
+                    ", fileName='" + fileName + '\'' +
                     '}';
+        }
+
+        public String getFileName4k() {
+            return fileName4k;
+        }
+
+        public void setFileName4k(String fileName4k) {
+            this.fileName4k = fileName4k;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
         }
 
         public Date getUtcDate() {
@@ -163,62 +185,65 @@ public class App {
 //        创建httpclient 请求
         HttpClient client = HttpClient.newBuilder().build();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("User-Agent", USER_AGENT)
-                .uri(URI.create(CN_BING_URL))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        JSONArray imagesJson = JSON.parseObject(response.body()).getJSONArray("images");
-        JSONObject jsonObject = imagesJson.getJSONObject(0);
+        JSONObject jsonObject = httpRe(client, CN_BING_URL);
 
         DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         images.setEndDate(fmt.parse(jsonObject.getString("enddate")));
         images.setUrl(jsonObject.getString("url"));
         images.setCopyrightCN(jsonObject.getString("copyright"));
         images.setHash(jsonObject.getString("hsh"));
+
+
         // 获取英文版权  因为时间差异 可能会不一样
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .header("User-Agent", USER_AGENT)
-                .uri(URI.create(YING_URL))
-                .build();
-        HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        JSONArray jsonArray = JSON.parseObject(httpResponse.body()).getJSONArray("images");
-        JSONObject object = jsonArray.getJSONObject(0);
+        JSONObject object = httpRe(client, YING_URL);
         images.setCopyright(object.getString("copyright"));
         images.setUrlForeign(jsonObject.getString("url"));
         images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
+
+
+        // 记录文件名。
+        String fileName = getUrlBase(images.getUrl()).replace("/th?id=", "");
+        images.setFileName("bing_" + fileName);
+        images.setFileName4k("4k_" + fileName);
         return images;
+    }
+
+    private static JSONObject httpRe(HttpClient client, String yingUrl) throws IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header("User-Agent", USER_AGENT)
+                .uri(URI.create(yingUrl))
+                .build();
+        HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        JSONArray jsonArray = JSON.parseObject(httpResponse.body()).getJSONArray("images");
+        return jsonArray.getJSONObject(0);
     }
 
     /**
      * 下载文件
      *
-     * @param url
+     * @param images
      * @throws Exception
      */
-    public static void downloadFile(String url) throws Exception {
+    public static void downloadFile(Images images) throws Exception {
         HttpClient client = HttpClient.newBuilder().build();
 
         // 4k
         HttpRequest request = HttpRequest.newBuilder()
                 .header("User-Agent", USER_AGENT)
-                .uri(URI.create(BASIS_URL + url))
+                .uri(URI.create(BASIS_URL + images.getUrl()))
                 .build();
 
         // 原图
-        url = getUrlBase(url);
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .header("User-Agent", USER_AGENT)
-                .uri(URI.create(BASIS_URL + url))
+                .uri(URI.create(BASIS_URL + getUrlBase(images.getUrl())))
                 .build();
 
-        String fileName = url.replace("/th?id=", "");
-        Path path = Paths.get("images/4k_" + fileName);
+        Path path = Paths.get("images/" + images.getFileName4k());
 
         HttpResponse<Path> response = client.send(request, HttpResponse.BodyHandlers.ofFile(path));
 
-        Path filePath = Paths.get("images/bing_" + fileName);
+        Path filePath = Paths.get("images/" + images.getFileName());
 
         HttpResponse<Path> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofFile(filePath));
 
@@ -352,6 +377,8 @@ public class App {
                 "  \"urlForeign\" TEXT,\n" +
                 "  \"copyright\" TEXT,\n " +
                 "   \"copyrightCN\" TEXT,\n " +
+                "  \"file_name_4k\" TEXT,\n" +
+                " \"file_name\" TEXT,\n" +
                 "  \"endDate\" DATE\n," +
                 "  \"utcDate\" DATE\n" +
                 ")";
@@ -359,7 +386,8 @@ public class App {
         statement.execute(dateBase);
         statement.close();
         // 保存
-        String sql = "INSERT INTO images(hash,url,copyright,endDate,urlForeign,copyrightCN,utcDate) VALUES(?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO images(hash,url,copyright,endDate,urlForeign,copyrightCN,utcDate,file_name_4k,file_name)" +
+                " VALUES(?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, images.getHash());
         preparedStatement.setString(2, images.getUrl());
@@ -368,6 +396,8 @@ public class App {
         preparedStatement.setString(5, images.getUrlForeign());
         preparedStatement.setString(6, images.getCopyrightCN());
         preparedStatement.setDate(7, new java.sql.Date(images.getUtcDate().getTime()));
+        preparedStatement.setString(8, images.getFileName4k());
+        preparedStatement.setString(9, images.getFileName());
         preparedStatement.execute();
         preparedStatement.close();
     }
@@ -430,8 +460,8 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         Images images = getImages();
-        downloadFile(images.getUrl());
-        
+        downloadFile(images);
+
         saveToSqlite(images);
         writeMd(images);
         String filePath = getJsonName();
