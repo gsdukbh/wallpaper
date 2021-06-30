@@ -267,7 +267,7 @@ public class App {
         String url = getUrlBase(images.url);
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + fmt.format(images.getEndDate()) + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") ";
+                + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") " + fmt.format(images.getEndDate()) ;
 
         fileWriter.write(readme);
         fileWriter.write("### 今天 today :");
@@ -287,7 +287,7 @@ public class App {
             int count = 0;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyrightCN() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-                        + fmt.format(i.getEndDate()) + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl()  + ") ";
+                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl()  + ") " fmt.format(i.getEndDate()) ;
                 fileWriter.write(tem);
                 count++;
                 if (count % 2 == 0) {
