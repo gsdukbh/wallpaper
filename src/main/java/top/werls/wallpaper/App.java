@@ -287,7 +287,7 @@ public class App {
             int count = 0;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyrightCN() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl()  + ") " fmt.format(i.getEndDate()) ;
+                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl()  + ") " + fmt.format(i.getEndDate()) ;
                 fileWriter.write(tem);
                 count++;
                 if (count % 2 == 0) {
