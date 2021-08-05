@@ -17,12 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: zip
-        run: |
-          tar -czvf 4k_wallpaper.tar.gz images/4k_*
-          tar -czvf wallpaper.tar.gz images/bing_*
-          tar -czvf wallpaper`echo $(date +"%Y-%m")`.tar.gz images/4k_`echo $(date +"%Y-%m")`*
-          tar -czvf 4k_wallpaper`echo $(date +"%Y-%m")`.tar.gz images/bing_`echo $(date +"%Y-%m")`*
-
+        run: ./bash.sh
       - name: Generate release tag
         id: tag
         run: |
