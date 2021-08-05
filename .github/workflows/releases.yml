@@ -17,7 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: zip
-        run: ./bash.sh
+        run: |
+          chmod +x bash.sh
+          ./bash.sh
       - name: Generate release tag
         id: tag
         run: |
