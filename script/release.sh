@@ -13,6 +13,7 @@ if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
    echo "打包上一年图片" >> release.txt
    else
      echo "::set-output name=release_tag::${nl}"
+     echo $nl
      touch release.txt
      echo "每月打包图片" >> release.txt
 fi
