@@ -2,6 +2,7 @@
 _date=$(echo $(date +"%Y"))
 day=$(echo $(date +"%m"))
 m=$(($day - 1))
+yeara=$(($_date-1))
 if [ -$m -lt 10 ]; then
   nl=$(echo "${_date}-0${m}")
 else
@@ -16,10 +17,10 @@ echo "压缩所有的原图图片"
 tar -czf up/wallpaper_all.tar.gz images/bing_*
 echo "压缩完成--wallpaper_all.tar.gz"
 
-if [ $(echo $(date +"%m-%d")) == "01-01" ]; then
+if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
   echo "打包上一年图片"
-  tar -czf up/4k_wallpaper_ $(echo $(_date)).tar.gz images/4k_$(echo $(_date))*
-  tar -czf up/wallpaper_ $(echo $(_date)).tar.gz images/bing_$(echo $(_date))*
+  tar -czf up/4k_wallpaper_ $(echo $(yeara)).tar.gz images/4k_$(echo $(yeara))*
+  tar -czf up/wallpaper_ $(echo $(yeara)).tar.gz images/bing_$(echo $(yeara))*
   elif [ ! -f $($images)  ]; then
     echo "开始当前压缩上个月份的图片"
     tar -czf up/4k_wallpaper_$(echo $(nl))_.tar.gz images/4k_$(echo $(nl))*

@@ -19,4 +19,4 @@ if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
      echo "打包${m}月份的图片" >> release.txt
      }
 fi
-echo "::set-output name=release_tag::${tagName}"
+echo "::set-output name=release_tag::${tagName})"
