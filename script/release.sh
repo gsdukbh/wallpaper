@@ -2,11 +2,10 @@ _date=$(echo $(date +"%Y"))
 day=$(echo $(date +"%m"))
 m=$(($day - 1))
 if [ -$m -lt 10 ]; then
-  nl=$(echo "${_date}-0${m}")
+  nl=$(echo "${_date}0${m}")
 else
-  nl=$(echo "${_date}-${m}")
+  nl=$(echo "${_date}${m}")
 fi
-
 
 if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
    echo "::set-output name=release_tag::$(date +"%Y")"
