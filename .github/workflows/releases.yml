@@ -22,6 +22,7 @@ jobs:
           ./script/bash.sh
       - name: Generate release tag
         id: tag
+        shell: bash
         run: |
           chmod +x script/release.sh
           ./script/release.sh
