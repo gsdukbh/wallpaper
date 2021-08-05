@@ -6,8 +6,10 @@ if [ -$m -lt 10 ]; then
 else
   nl=$(echo "${_date}-${m}")
 fi
-if [ $(echo $(date +"%m-%d")) == "01-01" ]; then
-   echo "::set-output name=release_tag::${_date)}"
+
+
+if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
+   echo "::set-output name=release_tag::$(date +"%Y")"
    touch release.txt
    echo "打包上一年图片" >> release.txt
    else
