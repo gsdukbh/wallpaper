@@ -202,9 +202,11 @@ public class App {
 
 
         // 记录文件名。
+        // 添加日期
         String fileName = getUrlBase(images.getUrl()).replace("/th?id=", "");
-        images.setFileName("bing_" + fileName);
-        images.setFileName4k("4k_" + fileName);
+        DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        images.setFileName("bing_" + simpleDateFormat.format(images.endDate) + "_" + fileName);
+        images.setFileName4k("4k_" + simpleDateFormat.format(images.endDate) + "_" + fileName);
         return images;
     }
 
@@ -267,7 +269,7 @@ public class App {
         String url = getUrlBase(images.url);
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
-                + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") " + fmt.format(images.getEndDate()) ;
+                + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") " + fmt.format(images.getEndDate());
 
         fileWriter.write(readme);
         fileWriter.write("### 今天 today :");
@@ -278,6 +280,7 @@ public class App {
                 "| :----: | :----: | ";
         List<Images> imagesList = readerJson(getJsonName());
 
+        //倒序
         imagesList = imagesList.stream().sorted(Comparator.comparing(Images::getEndDate).reversed()).collect(Collectors.toList());
 
         if (imagesList.size() > 0) {
@@ -287,7 +290,7 @@ public class App {
             int count = 0;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyrightCN() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl()  + ") " + fmt.format(i.getEndDate()) ;
+                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl() + ") " + fmt.format(i.getEndDate());
                 fileWriter.write(tem);
                 count++;
                 if (count % 2 == 0) {
