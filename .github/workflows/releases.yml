@@ -16,17 +16,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: zip
+      - name: gzip
         run: |
-          chmod +x bash.sh
-          ./bash.sh
+          chmod +x script/bash.sh
+          ./script/bash.sh
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::$(date +"%Y-%m")"
-          touch release.txt
-          echo "Pack pictures every month" >> release.txt
-
+          chmod +x script/release.sh
+          ./script/release.sh
       - name: Upload  to release
         uses: softprops/action-gh-release@v1
         env:
