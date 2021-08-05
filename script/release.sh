@@ -1,18 +1,18 @@
 _date=$(echo $(date +"%Y"))
 day=$(echo $(date +"%m"))
 m=$(($day - 1))
+yeara=$(($_date-1))
 if [ -$m -lt 10 ]; then
   tagName="${_date}0${m}"
 else
   tagName="${_date}${m}"
 fi
-
+#echo "::set-output name=release_tag::$(date +"%Y")"
+echo "::set-output name=release_tag::${tagName}"
 if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
-   echo "::set-output name=release_tag::$(date +"%Y")"
    touch release.txt
-   echo "打包上一年图片" >> release.txt
+   echo "打包${_date}年图片" >> release.txt
    else
-     echo "::set-output name=release_tag::${tagName}"
      touch release.txt
-     echo "每月打包图片" >> release.txt
+     echo "打包${m}月份的图片" >> release.txt
 fi
