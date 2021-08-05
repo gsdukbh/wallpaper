@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: zip
         run: |
           tar -czvf 4k_wallpaper.tar.gz images/4k_*
