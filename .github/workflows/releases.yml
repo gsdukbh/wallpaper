@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "::set-output name=release_tag::$(date +"%Y-%m")"
           touch release.txt
-          "Pack pictures every month " >> release.txt
+          echo "Pack pictures every month" >> release.txt
 
       - name: Upload  to release
         uses: softprops/action-gh-release@v1
