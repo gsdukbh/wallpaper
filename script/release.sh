@@ -8,11 +8,15 @@ else
   tagName="${_date}${m}"
 fi
 #echo "::set-output name=release_tag::$(date +"%Y")"
-echo "::set-output name=release_tag::${tagName}"
 if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
+  {
    touch release.txt
-   echo "打包${_date}年图片" >> release.txt
+   echo "打包${yeara}年图片" >> release.txt
+  }
    else
+     {
      touch release.txt
      echo "打包${m}月份的图片" >> release.txt
+     }
 fi
+echo "::set-output name=release_tag::${tagName}"
