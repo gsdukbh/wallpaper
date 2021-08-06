@@ -1,8 +1,8 @@
 # shellcheck disable=SC2046
 _date=$(echo $(date +"%Y"))
 day=$(echo $(date +"%m"))
-m=$(($day - 1))
-yeara=$(($_date-1))
+m=$((10#$day - 1))
+yeara=$((10#$_date-1))
 if [ -$m -lt 10 ]; then
   nl=$(echo "${_date}-0${m}")
 else
