@@ -1,4 +1,4 @@
-# shellcheck disable=SC2046
+# bin/bash
 _date=$(echo $(date +"%Y"))
 day=$(echo $(date +"%m"))
 m=$((10#$day - 1))
@@ -8,7 +8,10 @@ if [ -$m -lt 10 ]; then
 else
   nl=$(echo "${_date}-${m}")
 fi
-images="images/4k_$nl"
+
+
+images=`ls | grep images/4k_$nl`
+
 mkdir "up"
 echo "压缩所有的4k图片"
 tar -czf up/4k_wallpaper_all.tar.gz images/4k_*
@@ -21,7 +24,7 @@ if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
   echo "打包上一年图片"
   tar -czf up/4k_wallpaper_ $(echo $(yeara)).tar.gz images/4k_$(echo $(yeara))*
   tar -czf up/wallpaper_ $(echo $(yeara)).tar.gz images/bing_$(echo $(yeara))*
-  elif [ ! -f $($images)  ]; then
+  elif  test -n $images ; then
     echo "开始当前压缩上个月份的图片"
     tar -czf up/4k_wallpaper_$(echo $(nl))_.tar.gz images/4k_$(echo $(nl))*
     tar -czf up/wallpaper_$(echo $(nl))_.tar.gz images/bing_$(echo $(nl))*
