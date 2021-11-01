@@ -3,12 +3,12 @@ _date=`date +"%Y"`
 day=`date +"%m"`
 m=$((10#$day - 1))
 yeara=$((10#$_date-1))
-if [ -$m -lt 10 ]; then
+if [ -$m -ge 10 ]; then
   nl=$(echo "${_date}-0${m}")
 else
   nl=$(echo "${_date}-${m}")
 fi
-
+echo $nl
 
 images=`ls | grep images/4k_$nl`
 
