@@ -28,6 +28,10 @@ if [ $date_temp = "01-01" ]; then
   tar -czf up/wallpaper_${yeara}.tar.gz images/bing_${yeara}*
 fi
 
+if [ $nl = 0 ]; then
+  nl=12
+fi
+
 if test -n $images; then
   echo "开始当前压缩上个月份的图片"
   tar -czf up/4k_wallpaper_${nl}.tar.gz images/4k_${nl}*
