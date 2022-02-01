@@ -3,7 +3,7 @@ _date=$(date +"%Y")
 day=$(date +"%m")
 m=$((10#$day - 1))
 yeara=$((10#$_date - 1))
-if [ -$m -ge 10 ]; then
+if [ -$m -lt 10 ]; then
   nl=$(echo "${_date}-0${m}")
 else
   nl=$(echo "${_date}-${m}")
@@ -28,8 +28,8 @@ if [ $date_temp = "01-01" ]; then
   tar -czf up/wallpaper_${yeara}.tar.gz images/bing_${yeara}*
 fi
 
-if [ $nl = 0 ]; then
-  nl=12
+if [ $m = 0 ]; then
+  nl=$(echo "${_date}-12")
 fi
 
 if test -n $images; then
