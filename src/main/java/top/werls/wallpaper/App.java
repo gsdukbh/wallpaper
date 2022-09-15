@@ -21,21 +21,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
  * @author leejiawei
  */
 public class App {
 
-
     private static final String UHD_WIDTH = "3840";
     private static final String UHD_HEIGHT = "2160";
-    private static final String YING_URL = "https://bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth=" + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
+    private static final String YING_URL = "https://bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth="
+            + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
 
     private static final String BASIS_URL = "https://cn.bing.com";
 
     // 使用代理
-    private static final String CN_BING_URL = "https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth="+ UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
+    private static final String CN_BING_URL = "https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&uhd=1&uhdwidth="
+            + UHD_WIDTH + "&uhdheight=" + UHD_HEIGHT;
 
     public static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
 
@@ -50,130 +50,6 @@ public class App {
     public static final String CONNECT = "jdbc:sqlite:sqlite.db";
 
     /**
-     * images 对象
-     */
-    public static class Images {
-        /**
-         * 日期
-         */
-        @JSONField(format = "yyyy-MM-dd")
-        private Date endDate;
-
-        /**
-         * url
-         */
-        private String url;
-        /**
-         * 版权信息
-         */
-        private String copyright;
-
-        private String copyrightCN;
-        /**
-         * hash 值
-         */
-        private String hash;
-
-        private Date utcDate;
-
-        private String urlForeign;
-
-        private String fileName4k;
-
-        private String fileName;
-
-        @Override
-        public String toString() {
-            return "Images{" +
-                    "endDate=" + endDate +
-                    ", url='" + url + '\'' +
-                    ", copyright='" + copyright + '\'' +
-                    ", copyrightCN='" + copyrightCN + '\'' +
-                    ", hash='" + hash + '\'' +
-                    ", utcDate=" + utcDate +
-                    ", urlForeign='" + urlForeign + '\'' +
-                    ", fileName4k='" + fileName4k + '\'' +
-                    ", fileName='" + fileName + '\'' +
-                    '}';
-        }
-
-        public String getFileName4k() {
-            return fileName4k;
-        }
-
-        public void setFileName4k(String fileName4k) {
-            this.fileName4k = fileName4k;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public Date getUtcDate() {
-            return utcDate;
-        }
-
-        public void setUtcDate(Date utcDate) {
-            this.utcDate = utcDate;
-        }
-
-        public String getUrlForeign() {
-            return urlForeign;
-        }
-
-        public void setUrlForeign(String urlForeign) {
-            this.urlForeign = urlForeign;
-        }
-
-        public String getCopyrightCN() {
-            return copyrightCN;
-        }
-
-        public void setCopyrightCN(String copyrightCN) {
-            this.copyrightCN = copyrightCN;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getCopyright() {
-            return copyright;
-        }
-
-        public void setCopyright(String copyright) {
-            this.copyright = copyright;
-        }
-
-        public String getHash() {
-            return hash;
-        }
-
-        public void setHash(String hash) {
-            this.hash = hash;
-        }
-
-        public Images() {
-        }
-    }
-
-    /**
      * 获取图片信息
      *
      * @return
@@ -182,10 +58,10 @@ public class App {
     public static Images getImages() throws Exception {
         Images images = new Images();
 
-//        创建httpclient 请求
+        // 创建httpclient 请求
         HttpClient client = HttpClient.newBuilder().build();
 
-        JSONObject jsonObject = httpRe(client, CN_BING_URL);
+        JSONObject jsonObject = httpRe(client, CN_BING_URL,"110.242.68.66");
 
         DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         images.setEndDate(fmt.parse(jsonObject.getString("enddate")));
@@ -193,25 +69,24 @@ public class App {
         images.setCopyrightCN(jsonObject.getString("copyright"));
         images.setHash(jsonObject.getString("hsh"));
 
-
-        // 获取英文版权  因为时间差异 可能会不一样
-        JSONObject object = httpRe(client, YING_URL);
+        // 获取英文版权 因为时间差异 可能会不一样
+        JSONObject object = httpRe(client, YING_URL,"");
         images.setCopyright(object.getString("copyright"));
         images.setUrlForeign(jsonObject.getString("url"));
         images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
-
 
         // 记录文件名。
         // 添加日期
         String fileName = getUrlBase(images.getUrl()).replace("/th?id=", "");
         DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        images.setFileName("bing_" + simpleDateFormat.format(images.endDate) + "_" + fileName);
-        images.setFileName4k("4k_" + simpleDateFormat.format(images.endDate) + "_" + fileName);
+        images.setFileName("bing_" + simpleDateFormat.format(images.getEndDate()) + "_" + fileName);
+        images.setFileName4k("4k_" + simpleDateFormat.format(images.getEndDate()) + "_" + fileName);
         return images;
     }
 
-    private static JSONObject httpRe(HttpClient client, String yingUrl) throws IOException, InterruptedException {
+    private static JSONObject httpRe(HttpClient client, String yingUrl,String xfor) throws IOException, InterruptedException {
         HttpRequest httpRequest = HttpRequest.newBuilder()
+                .header("x-forwarded-for", xfor)
                 .header("User-Agent", USER_AGENT)
                 .uri(URI.create(yingUrl))
                 .build();
@@ -262,11 +137,12 @@ public class App {
         File file = new File(README);
         FileWriter fileWriter = new FileWriter(file);
 
-        String readme = "# wallpaper \n" + "[![Java CI with Gradle](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml/badge.svg)](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml)"
+        String readme = "# wallpaper \n"
+                + "[![Java CI with Gradle](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml/badge.svg)](https://github.com/gsdukbh/wallpaper/actions/workflows/gradle.yml)"
                 + "\n\n bing wallpaper 4k download\n";
 
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-        String url = getUrlBase(images.url);
+        String url = getUrlBase(images.getUrl());
 
         String md = "![" + images.getCopyright() + "]" + "(" + BASIS_URL + images.getUrl() + ") "
                 + "  [ " + images.getCopyrightCN() + "  ](" + BASIS_URL + url + ") " + fmt.format(images.getEndDate());
@@ -280,8 +156,9 @@ public class App {
                 "| :----: | :----: | ";
         List<Images> imagesList = readerJson(getJsonName());
 
-        //倒序
-        imagesList = imagesList.stream().sorted(Comparator.comparing(Images::getEndDate).reversed()).collect(Collectors.toList());
+        // 倒序
+        imagesList = imagesList.stream().sorted(Comparator.comparing(Images::getEndDate).reversed())
+                .collect(Collectors.toList());
 
         if (imagesList.size() > 0) {
             fileWriter.write("\n");
@@ -290,7 +167,8 @@ public class App {
             int count = 0;
             for (Images i : imagesList) {
                 String tem = "| ![" + i.getCopyrightCN() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl() + ") " + fmt.format(i.getEndDate());
+                        + " [ " + i.getCopyrightCN() + "](" + BASIS_URL + i.getUrl() + ") "
+                        + fmt.format(i.getEndDate());
                 fileWriter.write(tem);
                 count++;
                 if (count % 2 == 0) {
@@ -303,12 +181,14 @@ public class App {
             }
         }
 
-//        imagesList.forEach(i -> {
-//            int count = 1 ;
-//            String  tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() + ") "
-//                    + fmt.format(i.getEndDate()) + "  " + i.getCopyright() + "  [ download ](" + BASIS_URL + url + ") |";
-//
-//        });
+        // imagesList.forEach(i -> {
+        // int count = 1 ;
+        // String tem = "| ![" + i.getCopyright() + "]" + "(" + BASIS_URL + i.getUrl() +
+        // ") "
+        // + fmt.format(i.getEndDate()) + " " + i.getCopyright() + " [ download ](" +
+        // BASIS_URL + url + ") |";
+        //
+        // });
 
         fileWriter.close();
     }
@@ -327,7 +207,7 @@ public class App {
     public static List<Images> readerJson(String filePath) throws Exception {
         File file = new File(filePath);
         if (!Files.exists(Path.of(filePath))) {
-//            Files.createFile(Path.of(filePath));
+            // Files.createFile(Path.of(filePath));
             return new ArrayList<>();
         }
         FileReader reader = new FileReader(file);
@@ -389,7 +269,8 @@ public class App {
         statement.execute(dateBase);
         statement.close();
         // 保存
-        String sql = "INSERT INTO images(hash,url,copyright,endDate,urlForeign,copyrightCN,utcDate,file_name_4k,file_name)" +
+        String sql = "INSERT INTO images(hash,url,copyright,endDate,urlForeign,copyrightCN,utcDate,file_name_4k,file_name)"
+                +
                 " VALUES(?,?,?,?,?,?,?,?,?)";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, images.getHash());
@@ -404,7 +285,6 @@ public class App {
         preparedStatement.execute();
         preparedStatement.close();
     }
-
 
     /**
      * 读取 sqlite
@@ -431,7 +311,6 @@ public class App {
         }
         return list;
     }
-
 
     public static void writeToTxt(String newFile) throws Exception {
         File file = new File(FILE_INDEX);
