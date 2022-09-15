@@ -35,8 +35,7 @@ public class App {
     private static final String BASIS_URL = "https://cn.bing.com";
 
     // 使用代理
-    private static final String CN_BING_URL = "https://world.werls.top/bing";
-    //private static final String CN_BING_URL = "https://rpi.werls.top/bing";
+    private static final String CN_BING_URL = "https://cn.bing.com";
 
     public static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
 
