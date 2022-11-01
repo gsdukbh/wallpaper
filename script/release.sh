@@ -10,4 +10,5 @@ if [ $(echo $(date +"%m-%d")) = "01-01" ]; then
      echo "打包$(echo $(date +"%Y"))-$((10#$(echo $(date +"%m")) - 1))月份的图片。" >> release.txt
      }
 fi
-echo "::set-output name=release_tag::v$(echo $(date +"%Y")).$((10#$(echo $(date +"%m")) - 1))"
+#echo "::set-output name=release_tag::v$(echo $(date +"%Y")).$((10#$(echo $(date +"%m")) - 1))"
+echo "release_tag=v$(echo $(date +"%Y")).$((10#$(echo $(date +"%m")) - 1))" >> $GITHUB_OUTPUT
