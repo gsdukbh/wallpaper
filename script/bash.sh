@@ -1,7 +1,7 @@
 # bin/bash
 _date=$(date +"%Y")
 day=$(date +"%m")
-m=$((10#$day - 1))
+m=`expr $day - 1`
 yeara=$((10#$_date - 1))
 if [ -$m -lt 10 ]; then
   nl=$(echo "${_date}-0${m}")
