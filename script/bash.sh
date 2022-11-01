@@ -3,7 +3,7 @@ _date=$(date +"%Y")
 day=$(date +"%m")
 m=`expr $day - 1`
 yeara=$((10#$_date - 1))
-if [ -$m -lt 10 ]; then
+if [ $m -lt 10 ]; then
   nl=$(echo "${_date}-0${m}")
 else
   nl=$(echo "${_date}-${m}")
