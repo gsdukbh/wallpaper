@@ -29,7 +29,7 @@ if [ $date_temp = "01-01" ]; then
 fi
 
 if [ $m = 0 ]; then
-  nl=$(echo "${_date}-12")
+  nl=$(echo "${yeara}-12")
 fi
 
 if test -n $images; then
