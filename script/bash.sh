@@ -20,9 +20,9 @@ mkdir "up"
 # tar -czf up/wallpaper_all.tar.gz images/bing_*
 # echo "压缩完成--wallpaper_all.tar.gz"
 
-date_temp=$(date +"%m-%d")
+date_temp=$(date +"%m")
 
-if [ $date_temp = "01-01" ]; then
+if [ $date_temp = "01" ]; then
   echo "打包上一年图片"
   tar -czf up/4k_wallpaper_${yeara}.tar.gz images/4k_${yeara}*
   tar -czf up/wallpaper_${yeara}.tar.gz images/bing_${yeara}*
