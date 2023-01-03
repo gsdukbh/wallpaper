@@ -2,7 +2,7 @@
 if [ $(echo $(date +"%m")) = "01" ]; then
   {
    touch release.txt
-   year=$((10#$_date - 1))
+   year=$((10#$(date +"%Y") - 1))
    echo "打包 $year 年图片。" >> release.txt
    echo "release_tag=v$year" >> $GITHUB_OUTPUT
   }
