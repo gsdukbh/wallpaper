@@ -55,6 +55,7 @@ public class App {
   public static final String README = "README.md";
 
   public static final String CONNECT = "jdbc:sqlite:sqlite.db";
+  public static final String IMAGES = "images/";
 
   /**
    * 获取图片信息
@@ -128,11 +129,11 @@ public class App {
             .uri(URI.create(BASIS_URL + getUrlBase(images.getUrl())))
             .build();
 
-    Path path = Paths.get("images/" + images.getFileName4k());
+    Path path = Paths.get(IMAGES + images.getFileName4k());
 
     HttpResponse<Path> response = client.send(request, HttpResponse.BodyHandlers.ofFile(path));
 
-    Path filePath = Paths.get("images/" + images.getFileName());
+    Path filePath = Paths.get(IMAGES + images.getFileName());
 
     HttpResponse<Path> httpResponse =
         client.send(httpRequest, HttpResponse.BodyHandlers.ofFile(filePath));
@@ -160,14 +161,15 @@ public class App {
     DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
     String url = getUrlBase(images.getUrl());
 
+    String path = Paths.get(IMAGES).toString();
     String md =
         """
             ![%1$s](%2$s%3$s) [%4$s](%2$s%5$s) %6$s
             """
             .formatted(
                 images.getCopyright(),
-                BASIS_URL,
-                images.getUrl(),
+                path,
+                images.getFileName(),
                 images.getCopyrightCN(),
                 url,
                 fmt.format(images.getEndDate()));
@@ -176,17 +178,17 @@ public class App {
     fileWriter.write("### 今天 today :");
     fileWriter.write("\n");
     fileWriter.write(md);
-    List<Images> imagesList = readerJson(getJsonName());
+    List<Images> imagesList = getFromSqlite();
 
     // 倒序
     imagesList =
         imagesList.stream()
             .sorted(Comparator.comparing(Images::getEndDate).reversed())
-            .collect(Collectors.toList());
+            .toList();
     var monthFmt = new SimpleDateFormat("MM");
     var yearMonthFmt = new SimpleDateFormat("yyyy-MM");
     String from = "|     |    |\n" + "| ---- | ---- |";
-    if (imagesList.size() > 0) {
+    if (!imagesList.isEmpty()) {
       int count = 0;
       var month = "";
       for (Images i : imagesList) {
@@ -209,8 +211,8 @@ public class App {
             " |![%1$s](%2$s%3$s) [%4$s](%2$s%3$s) %5$s"
                 .formatted(
                     i.getCopyrightCN(),
-                    BASIS_URL,
-                    i.getUrl(),
+                    path,
+                    i.getFileName(),
                     i.getCopyrightCN(),
                     fmt.format(i.getEndDate()));
         fileWriter.write(tem);
@@ -226,6 +228,7 @@ public class App {
     }
     fileWriter.close();
   }
+
 
   public static String getUrlBase(String url) {
     return url.substring(0, url.indexOf("&"));
@@ -261,7 +264,7 @@ public class App {
   /**
    * 写入 json
    *
-   * @param images list
+   * @param images   list
    * @param filePath file
    * @throws Exception
    */
@@ -382,7 +385,8 @@ public class App {
     saveToSqlite(images);
     writeMd(images);
     String filePath = getJsonName();
-    List<Images> imagesList = readerJson(filePath);
+    List<Images> imagesList = getFromSqlite();
+//    List<Images> imagesList = readerJson(filePath);
     imagesList.add(images);
     if (imagesList.size() > JSON_SIZE) {
       String[] f = getJsonName().split(JSON_NAME);
