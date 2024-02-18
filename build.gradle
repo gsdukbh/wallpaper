@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'application'
-    id 'java-library'
 }
 
 
@@ -28,15 +27,12 @@ test {
 application {
     mainClassName = "top.werls.wallpaper.App"
 }
+
 jar {
-//      配置jar 包主类 https://stackoverflow.com/questions/4871656/using-gradle-to-build-a-jar-with-dependencies?answertab=active#tab-top
-//    from {
-//        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-//    }
-    // 新方法 ，https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
+    duplicatesStrategy = 'exclude' // 或者 'fail'，具体取决于你的需求
     manifest {
         attributes(
                 'Main-Class': 'top.werls.wallpaper.App'
