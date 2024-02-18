@@ -161,10 +161,10 @@ public class App {
     DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
     String url = getUrlBase(images.getUrl());
 
-    String path =IMAGES;
+    String path = IMAGES;
     String md =
         """
-            ![%1$s](%2$s%3$s) [%4$s](%2$s%5$s) %6$s
+            ![%1$s](%2$s%3$s) [%4$s](%7$s%5$s) %6$s
             """
             .formatted(
                 images.getCopyright(),
@@ -172,7 +172,9 @@ public class App {
                 images.getFileName(),
                 images.getCopyrightCN(),
                 url,
-                fmt.format(images.getEndDate()));
+                fmt.format(images.getEndDate()),
+                BASIS_URL
+            );
 
     fileWriter.write(readme);
     fileWriter.write("### 今天 today :");
@@ -208,13 +210,15 @@ public class App {
         }
         month = monthFmt.format(i.getEndDate());
         String tem =
-            " |![%1$s](%2$s%3$s) [%4$s](%2$s%3$s) %5$s"
+            " |![%1$s](%2$s%3$s) [%4$s](%6$s%3$s) %5$s"
                 .formatted(
                     i.getCopyrightCN(),
                     path,
                     i.getFileName(),
                     i.getCopyrightCN(),
-                    fmt.format(i.getEndDate()));
+                    fmt.format(i.getEndDate()),
+                    BASIS_URL
+                );
         fileWriter.write(tem);
         count++;
         if (count % 2 == 0) {
@@ -345,6 +349,8 @@ public class App {
       images.setEndDate(new Date(resultSet.getDate("endDate").getTime()));
       images.setUtcDate(new Date(resultSet.getDate("utcDate").getTime()));
       images.setCopyrightCN(resultSet.getString("copyrightCN"));
+      images.setFileName(resultSet.getString("file_name"));
+      images.setFileName4k(resultSet.getString("file_name_4k"));
       list.add(images);
     }
     return list;
