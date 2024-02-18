@@ -4,7 +4,7 @@
 bing wallpaper 4k download
 
 ### 今天 today :
-![Sperm whale pod surfacing, Dominica (© Franco Banfi/Minden Pictures)](imagesbing_2024-02-18_OHR.DominicaWhales_ZH-CN1293650397_UHD.jpg) [抹香鲸浮出水面，多米尼克 (© Franco Banfi/Minden Pictures)](images/th?id=OHR.DominicaWhales_ZH-CN1293650397_UHD.jpg) 2024-02-18
+![Sperm whale pod surfacing, Dominica (© Franco Banfi/Minden Pictures)](images/bing_2024-02-18_OHR.DominicaWhales_ZH-CN1293650397_UHD.jpg) [抹香鲸浮出水面，多米尼克 (© Franco Banfi/Minden Pictures)](images/th?id=OHR.DominicaWhales_ZH-CN1293650397_UHD.jpg) 2024-02-18
 
 ### 2024-02
 

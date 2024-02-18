@@ -161,7 +161,7 @@ public class App {
     DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
     String url = getUrlBase(images.getUrl());
 
-    String path = Paths.get(IMAGES).toString();
+    String path =IMAGES;
     String md =
         """
             ![%1$s](%2$s%3$s) [%4$s](%2$s%5$s) %6$s
