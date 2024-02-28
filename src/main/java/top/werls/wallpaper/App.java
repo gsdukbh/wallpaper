@@ -1,7 +1,10 @@
 package top.werls.wallpaper;
 
-import com.alibaba.fastjson.*;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.JSONWriter;
 
 import java.io.*;
 import java.net.URI;
@@ -19,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
  * @author leejiawei
@@ -48,7 +51,7 @@ public class App {
 
   public static final int JSON_SIZE = 1000;
 
-  public static final String JSON_NAME = "images.json";
+  public static final String JSON_NAME = "-images.json";
 
   public static final String FILE_INDEX = "index.txt";
 
@@ -56,6 +59,8 @@ public class App {
 
   public static final String CONNECT = "jdbc:sqlite:sqlite.db";
   public static final String IMAGES = "images/";
+
+
 
   /**
    * 获取图片信息
@@ -78,10 +83,10 @@ public class App {
     images.setHash(jsonObject.getString("hsh"));
 
     // 获取英文版权 因为时间差异 可能会不一样
-    JSONObject object = httpRe(client, YING_URL, "");
-    images.setCopyright(object.getString("copyright"));
-    images.setUrlForeign(jsonObject.getString("url"));
-    images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
+//    JSONObject object = httpRe(client, YING_URL, "");
+//    images.setCopyright(object.getString("copyright"));
+//    images.setUrlForeign(jsonObject.getString("url"));
+//    images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
 
     // 记录文件名。
     // 添加日期
@@ -102,6 +107,7 @@ public class App {
             .build();
     HttpResponse<String> httpResponse =
         client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
     JSONArray jsonArray = JSON.parseObject(httpResponse.body()).getJSONArray("images");
     return jsonArray.getJSONObject(0);
   }
@@ -274,13 +280,12 @@ public class App {
    */
   public static void writerJson(List<Images> images, String filePath) throws Exception {
     File file = new File(filePath);
-    if (!Files.exists(Path.of(filePath))) {
-      Files.createFile(Path.of(filePath));
+    Path path = Path.of(filePath);
+    if (!Files.exists(path)) {
+      Files.createFile(path);
     }
     FileWriter fileWriter = new FileWriter(file);
-    JSONWriter jsonWriter = new JSONWriter(fileWriter);
-    jsonWriter.writeObject(images);
-    jsonWriter.close();
+    fileWriter.write(JSON.toJSONString(images));
     fileWriter.close();
   }
 
@@ -356,17 +361,18 @@ public class App {
     return list;
   }
 
-  public static void writeToTxt(String newFile) throws Exception {
+  public static void writeToTxt(int newFile) throws Exception {
     File file = new File(FILE_INDEX);
     FileWriter writer = new FileWriter(file);
-    writer.write(newFile);
+    writer.write(String.valueOf(newFile));
     writer.close();
   }
 
   public static String readerTxt() throws Exception {
     File file = new File(FILE_INDEX);
-    if (!Files.exists(Path.of(FILE_INDEX))) {
-      Files.createFile(Path.of(FILE_INDEX));
+    Path path = Path.of(FILE_INDEX);
+    if (!Files.exists(path)) {
+      Files.createFile(path);
     }
     BufferedReader reader = new BufferedReader(new FileReader(file));
     String res = reader.readLine();
@@ -374,40 +380,41 @@ public class App {
     return res;
   }
 
-  public static String getJsonName() {
-    String res = null;
+  public static int getJsonName() {
+    int res = 0;
     try {
-      res = readerTxt();
+      res = Integer.parseInt(readerTxt());
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return res != null ? res : JSON_NAME;
+    return res;
+  }
+
+  public static void save2Json() {
+    try {
+      List<Images> imagesList = getFromSqlite();
+      int jsonIndex = getJsonName();
+      //分割文件。
+      // 按1000个存储一个json文件
+      int size = imagesList.size() / JSON_SIZE;
+      for (int i = jsonIndex; i <= size; i++) {
+        int start = i * JSON_SIZE;
+        int end = (i + 1) * JSON_SIZE;
+        List<Images> images = imagesList.subList(start, Math.min(end, imagesList.size()));
+        writerJson(images, i + JSON_NAME);
+        jsonIndex = i;
+      }
+      writeToTxt(jsonIndex);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   public static void main(String[] args) throws Exception {
     Images images = getImages();
     downloadFile(images);
-
     saveToSqlite(images);
     writeMd(images);
-    String filePath = getJsonName();
-    List<Images> imagesList = getFromSqlite();
-//    List<Images> imagesList = readerJson(filePath);
-    imagesList.add(images);
-    if (imagesList.size() > JSON_SIZE) {
-      String[] f = getJsonName().split(JSON_NAME);
-      String fileName = "";
-      if (f.length > 0) {
-        int i = Integer.parseInt(f[0]) + 1;
-        fileName = i + JSON_NAME;
-      } else {
-        fileName = 1 + JSON_NAME;
-      }
-      filePath = fileName;
-      writeToTxt(fileName);
-      imagesList.clear();
-      imagesList.add(images);
-    }
-    writerJson(imagesList, filePath);
+    save2Json();
   }
 }
