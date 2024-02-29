@@ -83,10 +83,10 @@ public class App {
     images.setHash(jsonObject.getString("hsh"));
 
     // 获取英文版权 因为时间差异 可能会不一样
-//    JSONObject object = httpRe(client, YING_URL, "");
-//    images.setCopyright(object.getString("copyright"));
-//    images.setUrlForeign(jsonObject.getString("url"));
-//    images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
+   JSONObject object = httpRe(client, YING_URL, "");
+   images.setCopyright(object.getString("copyright"));
+   images.setUrlForeign(jsonObject.getString("url"));
+   images.setUtcDate(fmt.parse(jsonObject.getString("enddate")));
 
     // 记录文件名。
     // 添加日期
