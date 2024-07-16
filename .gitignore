@@ -143,7 +143,7 @@ gradle-app.setting
 
 .project
 .classpath
-/.idea/
-/.gradle/
-/.settings/
-/.idea/
+*.idea/
+*.gradle/
+.settings/
+*.idea/
