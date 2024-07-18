@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  */
 class AppTest {
 
-  // @Test
+   @Test
   void saveToSqlite() throws Exception {
     List<Images> imagesList = getFromSqlite();
     int jsonIndex = getJsonName();
