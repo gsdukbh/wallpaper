@@ -33,7 +33,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew jar
       - name: run application
         run: java -jar build/libs/wallpaper-1.0-SNAPSHOT.jar
       - name: Commit file to github
