@@ -144,6 +144,6 @@ gradle-app.setting
 .project
 .classpath
 *.idea/
-*.gradle/
+.gradle/**
 .settings/
 *.idea/
