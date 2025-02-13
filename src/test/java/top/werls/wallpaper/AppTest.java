@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Calendar;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -39,5 +40,8 @@ class AppTest {
 
     writeToTxt(jsonIndex);
     System.out.println("size: " + size + " index: " + jsonIndex);
+     Calendar cal = Calendar.getInstance();
+
+     System.out.println(cal.get(Calendar.YEAR));
   }
 }

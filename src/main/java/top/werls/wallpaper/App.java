@@ -18,9 +18,11 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -185,8 +187,32 @@ public class App {
     fileWriter.write("### 今天 today :");
     fileWriter.write("\n");
     fileWriter.write(md);
+    fileWriter.close();
+
     List<Images> imagesList = getFromSqlite();
 
+    fileWriter = new FileWriter(file, true);
+    // 写入今年的数据。
+
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(images.getEndDate());
+    int currentYear = cal.get(Calendar.YEAR);
+
+    var tem = imagesList.stream().filter(i -> {
+      Calendar imgCal = Calendar.getInstance();
+      imgCal.setTime(i.getEndDate());
+      return imgCal.get(Calendar.YEAR) == currentYear;
+    }).toList();
+
+    writeReadmeFile(tem, fileWriter, path, fmt);
+    fileWriter.close();
+
+    archiveMd(imagesList);
+
+  }
+
+  private static void writeReadmeFile(List<Images> imagesList, FileWriter fileWriter, String path,
+      DateFormat fmt) throws IOException {
     // 倒序
     imagesList =
         imagesList.stream()
@@ -235,7 +261,64 @@ public class App {
         fileWriter.write("|");
       }
     }
-    fileWriter.close();
+  }
+
+
+  /**
+   * 按年份存档以前的图片
+   *
+   * @param data 数据
+   */
+  public static void archiveMd( List<Images> data){
+
+    var group = data.stream().collect(Collectors.groupingBy(images -> {
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(images.getEndDate());
+      return cal.get(Calendar.YEAR);
+     }));
+
+    List<String> archiveFiles = new ArrayList<>();
+    group.forEach((k,v) -> {
+      try {
+
+        if (k != Calendar.getInstance().get(Calendar.YEAR)) {
+          String  archive ="archive";
+          // 判断是否存在目录archive
+          if (!Files.exists(Path.of(archive))) {
+            Files.createDirectory(Path.of(archive));
+          }
+          // 跳过已经存在的文件
+          String file = "archive/"+k+".md";
+          archiveFiles.add(file);
+          if (Files.exists(Path.of(file))) {
+            return;
+          }
+          // 创建文件
+          FileWriter fileWriter = new FileWriter(file);
+          writeReadmeFile(v, fileWriter, "../"+IMAGES, new SimpleDateFormat("yyyy-MM-dd"));
+          fileWriter.close();
+        }
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }});
+
+    // 追加到readme，存档信息
+    try {
+      FileWriter fileWriter = new FileWriter(README, true);
+      fileWriter.write("\n");
+      fileWriter.write("### 存档 archive :");
+      fileWriter.write("\n");
+
+      for (String file : archiveFiles) {
+        fileWriter.write("["+file.replace("archive/","")+"]("+file+") \n\n");
+      }
+
+      fileWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 
 
@@ -340,7 +423,7 @@ public class App {
    */
   public static List<Images> getFromSqlite() throws Exception {
     Connection connection = DriverManager.getConnection(CONNECT);
-    String sql = "SELECT * FROM images";
+    String sql = "SELECT * FROM images order by endDate desc";
     List<Images> list = new ArrayList<>();
     Statement statement = connection.createStatement();
     ResultSet resultSet = statement.executeQuery(sql);
