@@ -241,14 +241,15 @@ public class App {
         }
         month = monthFmt.format(i.getEndDate());
         String tem =
-            " |![%1$s](%2$s%3$s) [%4$s](%6$s%3$s) %5$s"
+            " |![%1$s](%2$s%3$s) [%4$s](%6$s%7$s) %5$s"
                 .formatted(
                     i.getCopyrightCN(),
                     path,
                     i.getFileName(),
                     i.getCopyrightCN(),
                     fmt.format(i.getEndDate()),
-                    BASIS_URL
+                    BASIS_URL,
+                    i.getUrlForeign,
                 );
         fileWriter.write(tem);
         count++;
