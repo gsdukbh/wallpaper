@@ -249,7 +249,7 @@ public class App {
                     i.getCopyrightCN(),
                     fmt.format(i.getEndDate()),
                     BASIS_URL,
-                    i.getUrlForeign,
+                    i.getUrlForeign()
                 );
         fileWriter.write(tem);
         count++;
@@ -419,7 +419,7 @@ public class App {
   /**
    * 读取 sqlite
    *
-   * @return
+   * @return li
    * @throws Exception
    */
   public static List<Images> getFromSqlite() throws Exception {
