@@ -11,7 +11,43 @@ on:
   schedule:
     - cron: '0 0 1 * *'
 jobs:
-  build:
+  probe-self-hosted:
+    name:  Probe Self-hosted Runner
+    runs-on: self-hosted  #
+    timeout-minutes: 1 
+    steps:
+      - name: Ping
+        run: echo "Self-hosted runner is online."
+        
+  build-on-github:
+    needs: probe-self-hosted
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: gzip
+        run: |
+          chmod +x script/bash.sh
+          ./script/bash.sh
+      - name: Generate release tag
+        id: tag
+        shell: bash
+        run: |
+          chmod +x script/release.sh
+          ./script/release.sh
+      - name: Upload  to release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          body_path: release.txt
+          files: up/*
+          
+  build-on-self-hosted:
+    needs: probe-self-hosted
+    if: success() 
     runs-on: self-hosted
     steps:
       - name: Checkout
