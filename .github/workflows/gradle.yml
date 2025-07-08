@@ -19,10 +19,54 @@ on:
 #    branches: [ main ]
 
 jobs:
-  build:
-
+  probe-self-hosted:
+    name:  Probe Self-hosted Runner
     runs-on: self-hosted
-
+    timeout-minutes: 1 
+    steps:
+      # 检查 自托管 状态。
+      - name: Ping
+        run: echo "Self-hosted runner is online."
+  
+  build-on-github:
+    name: Fallback Build on GitHub-hosted
+    needs: probe-self-hosted # 依赖于探针
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          # architecture: aarch64
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew jar
+      - name: run application
+        run: java -jar build/libs/wallpaper-1.0-SNAPSHOT.jar
+      - name: Commit file to github
+        run: |
+          git config --local user.email "gsdukbh@gmail.com"
+          git config --local user.name "JiaWei Lee"
+          git add images/4k_**
+          git add images/bing_**
+          git add index.txt
+          git add *.json
+          git add *.md
+          git add *.db
+          git add archive/*.md
+          git commit -m "auto update wallpaper"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+  build-on-self-hosted:
+    name:  Build on self-hosted
+    needs: probe-self-hosted # 依赖于探针
+    # 条件：仅当探针 Job 成功时才运行
+    if: success() 
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
