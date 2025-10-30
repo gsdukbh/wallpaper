@@ -147,3 +147,4 @@ gradle-app.setting
 .gradle/**
 .settings/
 *.idea/
+.github/instructions/copilot-instructions.md.instructions.md
