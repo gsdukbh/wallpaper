@@ -30,7 +30,7 @@ jobs:
         id: inspect
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.MY_GIT_TOKEN }}
           script: |
             const { data } = await github.rest.actions.listSelfHostedRunnersForRepo({
               owner: context.repo.owner,
