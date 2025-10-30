@@ -20,19 +20,21 @@ on:
 permissions:
   actions: read
 jobs:
+
   probe-self-hosted:
     name:  Probe Self-hosted Runner
     runs-on: ubuntu-latest
     outputs:
       self_hosted_available: ${{ steps.inspect.outputs.available }}
     steps:
+      - name: Check token length
+        run: echo "${{ secrets.RUNNER_ADMIN_TOKEN }}" | wc -c
       - name: Inspect self-hosted pool
         id: inspect
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.RUNNER_ADMIN_TOKEN }}
           script: |
-            echo "${{ secrets.RUNNER_ADMIN_TOKEN }}" | wc -c
             const { data } = await github.rest.actions.listSelfHostedRunnersForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
