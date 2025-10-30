@@ -78,6 +78,9 @@ jobs:
           git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.MY_GIT_TOKEN }}
+          branch: main
   build-on-self-hosted:
     name:  Build on self-hosted
     needs: probe-self-hosted # 依赖于探针
@@ -149,7 +152,9 @@ jobs:
           git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
-
+        with:
+          github_token: ${{ secrets.MY_GIT_TOKEN }}
+          branch: main
   deploy-hexo:
     name: Deploy Hexo to gh-pages
     needs:
