@@ -22,6 +22,8 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -60,6 +62,7 @@ public class App {
 
   public static final String CONNECT = "jdbc:sqlite:sqlite.db";
   public static final String IMAGES = "images/";
+  public static final String HEXO_DATA = "site2/source/_data/wallpapers.json";
 
 
 
@@ -210,6 +213,8 @@ public class App {
     archiveMd(imagesList);
 
   }
+
+
 
   private static void writeReadmeFile(List<Images> imagesList, FileWriter fileWriter, String path,
       DateFormat fmt) throws IOException {
@@ -493,11 +498,39 @@ public class App {
     }
   }
 
+  public static void saveToHexoData() {
+    try {
+      List<Images> imagesList = getFromSqlite();
+      DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+      List<Map<String, Object>> data = new ArrayList<>();
+
+      for (Images img : imagesList) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("date", fmt.format(img.getEndDate()));
+        item.put("title", img.getCopyrightCN());
+        item.put("copyrightCN", img.getCopyrightCN());
+        item.put("copyright", img.getCopyright());
+        item.put("image", IMAGES + img.getFileName());
+        item.put("image4k", img.getFileName4k() == null ? null : IMAGES + img.getFileName4k());
+        item.put("link", BASIS_URL + img.getUrl());
+        item.put("hash", img.getHash());
+        data.add(item);
+      }
+
+      Path out = Paths.get(HEXO_DATA);
+      Files.createDirectories(out.getParent());
+      Files.writeString(out, JSON.toJSONString(data, true));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public static void main(String[] args) throws Exception {
     Images images = getImages();
     downloadFile(images);
     saveToSqlite(images);
     writeMd(images);
     save2Json();
+    saveToHexoData();
   }
 }

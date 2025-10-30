@@ -1,0 +1,33 @@
+<%
+const imagePath = item.image ? url_for(sanitizePath(item.image)) : '';
+const image4kPath = item.image4k ? url_for(sanitizePath(item.image4k)) : null;
+const sourceLink = item.link ? item.link : null;
+const title = item.title || '每日壁纸';
+const alt = item.alt || title;
+const dateText = item.displayDate || (item.date ? formatDate(item.date) : '');
+%>
+<article class="site-card">
+  <% if (imagePath) { %>
+  <a href="<%- imagePath %>" target="_blank" rel="noopener">
+    <img src="<%- imagePath %>" alt="<%= alt %>" loading="lazy">
+  <%
+  const formatFn = typeof formatDate === 'function' ? formatDate : (value) => value || '';
+  const sanitizeFn = typeof sanitizePath === 'function' ? sanitizePath : (value) => value;
+  const imagePath = item.image ? url_for(sanitizeFn(item.image)) : '';
+  const image4kPath = item.image4k ? url_for(sanitizeFn(item.image4k)) : null;
+  const sourceLink = item.link ? item.link : null;
+  const title = item.title || '每日壁纸';
+  const alt = item.alt || title;
+  const dateText = item.displayDate || (item.date ? formatFn(item.date) : '');
+  %>
+      <a class="button primary" href="<%- imagePath %>" download>下载原图</a>
+      <% } %>
+      <% if (image4kPath) { %>
+      <a class="button secondary" href="<%- image4kPath %>" download>下载 4K</a>
+      <% } %>
+      <% if (sourceLink) { %>
+      <a class="button secondary" href="<%- sourceLink %>" target="_blank" rel="noopener">查看来源</a>
+      <% } %>
+    </div>
+  </div>
+</article>

@@ -144,3 +144,42 @@ jobs:
           git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
+
+  deploy-hexo:
+    name: Deploy Hexo to gh-pages
+    needs:
+      - build-on-github
+      - build-on-self-hosted
+      - fallback-on-self-hosted-failure
+    if: ${{ always() && (needs.build-on-github.result == 'success' || needs.build-on-self-hosted.result == 'success' || needs.fallback-on-self-hosted-failure.result == 'success') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure latest main branch
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull origin main
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: site2
+        run: npm install
+      - name: Sync resources for Hexo
+        run: |
+          rsync -a --delete images/ site2/source/images/
+          rsync -a --delete archive/ site2/source/archive/
+      - name: Build Hexo site
+        working-directory: site2
+        run: npm run build
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site2/public
+          commit_message: "chore: update hexo site"

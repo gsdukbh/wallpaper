@@ -1,0 +1,24 @@
+title: Wallpaper Hexo
+subtitle: "Bing 壁纸图集"
+description: "每日自动更新的 Bing 壁纸展示"
+author: "gsdukbh"
+language: zh-CN
+url: https://gsdukbh.github.io
+root: /
+theme: wallpaper
+source_dir: source
+public_dir: public
+theme_dir: themes
+permalink: :year/:month/:day/:title/
+date_format: YYYY-MM-DD
+timezone: Asia/Shanghai
+
+# 部署到 gh-pages 分支
+# 运行 `npm run deploy` 前先执行 `npm install`
+deploy:
+  type: git
+  repo: git@github.com:gsdukbh/wallpaper.git
+  branch: gh-pages
+
+# 在构建前请确保将最新的 images/ 与 archive/ 拷贝到 site2/source/ 对应目录
+# 可在 GitHub Actions 中自动处理

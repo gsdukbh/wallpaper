@@ -1,0 +1,112 @@
+<%
+const formatDate = (input) => {
+  if (!input) return '';
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) {
+    if (typeof input === 'string' && input.length === 10) {
+      const [y, m, d] = input.split(/[-/]/);
+      if (y && m && d) {
+        return `${y}年${m}月${d}日`;
+      }
+    }
+    return input;
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}年${month}月${day}日`;
+};
+
+const sanitizePath = (path) => {
+  if (!path) return null;
+  return path.startsWith('/') ? path : '/' + path;
+};
+
+const normalizeFromData = (item) => {
+  const clone = Object.assign({}, item);
+  clone.date = clone.date || clone.endDate || clone.utcDate || '';
+  clone.image = clone.image || clone.path || '';
+  clone.image = clone.image.replace(/^\//, '');
+  if (clone.image4k) {
+    clone.image4k = clone.image4k.replace(/^\//, '');
+  }
+  clone.title = clone.title || clone.caption || clone.copyrightCN || clone.copyright || '每日壁纸';
+  clone.alt = clone.alt || clone.title;
+  clone.link = clone.link || clone.source;
+  clone.displayDate = formatDate(clone.date);
+  return clone;
+};
+
+let wallpapers = Array.isArray(site.data.wallpapers)
+  ? site.data.wallpapers.filter(Boolean).map(normalizeFromData)
+  : [];
+
+if (!wallpapers.length) {
+  const staticFiles = (site.static_files || []).filter(file => file.path && file.path.startsWith('images/') && file.path.includes('bing_'));
+  const staticMap = new Map((site.static_files || []).map(file => [file.path, true]));
+  wallpapers = staticFiles.map(file => {
+    const name = file.path.split('/').pop();
+    const segments = name.split('_');
+    const dateStr = segments[1] || '';
+    const titleRaw = segments.slice(2).join('_').replace(/\.(jpg|jpeg|png)$/i, '');
+    const title = decodeURIComponent(titleRaw.replace(/[.-]/g, ' '));
+    const fourKPath = file.path.replace('/bing_', '/4k_');
+    return {
+      image: file.path,
+      image4k: staticMap.has(fourKPath) ? fourKPath : null,
+      date: dateStr,
+      displayDate: formatDate(dateStr),
+      title,
+      alt: title,
+      link: null
+    };
+  });
+}
+
+wallpapers.sort((a, b) => {
+  const timeA = new Date(a.date || 0).getTime();
+  const timeB = new Date(b.date || 0).getTime();
+  return timeB - timeA;
+});
+
+const latest = wallpapers.length ? wallpapers[0] : null;
+
+const monthGroups = wallpapers.reduce((acc, item) => {
+  const datePart = (item.date || '').toString();
+  const key = datePart.length >= 7 ? datePart.slice(0, 7) : 'unknown';
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(item);
+  return acc;
+}, {});
+
+const sortedMonths = Object.keys(monthGroups).sort((a, b) => b.localeCompare(a));
+%>
+
+<% if (latest) { %>
+<section class="hero">
+  <h2>今日推荐</h2>
+  <div class="hero-card">
+    <%- partial('_partial/card', { item: latest, formatDate: formatDate, sanitizePath: sanitizePath }) %>
+  </div>
+</section>
+<% } else { %>
+<section class="hero">
+  <h2>今日推荐</h2>
+  <p>暂时没有可展示的壁纸，请稍后再试。</p>
+</section>
+<% } %>
+
+<section class="gallery">
+  <% sortedMonths.forEach(function(monthKey) { %>
+    <% const items = monthGroups[monthKey]; %>
+    <% const displayMonth = monthKey === 'unknown' ? '未分组' : monthKey.replace('-', '年') + '月'; %>
+    <div class="month-section" id="month-<%= monthKey %>">
+      <h2><%= displayMonth %></h2>
+      <div class="wall-grid">
+        <% items.forEach(function(item) { %>
+          <%- partial('_partial/card', { item: item, formatDate: formatDate, sanitizePath: sanitizePath }) %>
+        <% }) %>
+      </div>
+    </div>
+  <% }) %>
+</section>

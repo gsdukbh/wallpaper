@@ -1,0 +1,14 @@
+<section class="archive-page">
+  <h2>按年份浏览历史壁纸</h2>
+  <p>以下链接会跳转至保存在仓库中的年度 Markdown 存档。</p>
+  <ul class="archive-list">
+    <%
+    const archiveFiles = (site.static_files || []).filter(file => file.path && file.path.startsWith('archive/') && file.path.endsWith('.md'));
+    archiveFiles.sort((a, b) => b.path.localeCompare(a.path));
+    archiveFiles.forEach(function(file) {
+      const year = file.path.replace('archive/', '').replace('.md', '');
+    %>
+      <li><a href="<%- url_for('/' + file.path) %>"><%= year %> 年</a></li>
+    <% }) %>
+  </ul>
+</section>

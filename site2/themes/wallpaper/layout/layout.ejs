@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= page.title ? page.title + ' · ' : '' %><%= config.title %></title>
+    <meta name="description" content="<%= config.description %>">
+    <link rel="stylesheet" href="<%- url_for('/css/style.css') %>">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1 class="site-title"><a href="<%- url_for('/') %>"><%= config.title %></a></h1>
+        <p class="site-desc"><%= config.description %></p>
+        <nav class="site-nav">
+          <% for (const name in theme.menu) { %>
+            <a href="<%- url_for(theme.menu[name]) %>"><%= name %></a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <%- body %>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>数据源自 Bing，每日自动更新。</p>
+      </div>
+    </footer>
+  </body>
+</html>
