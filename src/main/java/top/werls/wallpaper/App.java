@@ -510,8 +510,9 @@ public class App {
         item.put("title", img.getCopyrightCN());
         item.put("copyrightCN", img.getCopyrightCN());
         item.put("copyright", img.getCopyright());
-        item.put("image", IMAGES + img.getFileName());
-        item.put("image4k", img.getFileName4k() == null ? null : IMAGES + img.getFileName4k());
+        item.put("image", BASIS_URL + getUrlBase(img.getUrl()));
+        // item.put("image4k", img.getFileName4k() == null ? null : IMAGES + img.getFileName4k());
+        item.put("image4k", BASIS_URL + img.getUrl());
         item.put("link", BASIS_URL + img.getUrl());
         item.put("hash", img.getHash());
         data.add(item);

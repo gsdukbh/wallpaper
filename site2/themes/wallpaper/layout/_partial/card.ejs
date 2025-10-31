@@ -1,25 +1,26 @@
 <%
-const imagePath = item.image ? url_for(sanitizePath(item.image)) : '';
-const image4kPath = item.image4k ? url_for(sanitizePath(item.image4k)) : null;
+const formatFn = typeof formatDate === 'function' ? formatDate : (value) => value || '';
+const sanitizeFn = typeof sanitizePath === 'function' ? sanitizePath : (value) => value || '';
+const imagePath = item.image ? url_for(sanitizeFn(item.image)) : '';
+const image4kPath = item.image4k ? url_for(sanitizeFn(item.image4k)) : null;
 const sourceLink = item.link ? item.link : null;
 const title = item.title || '每日壁纸';
 const alt = item.alt || title;
-const dateText = item.displayDate || (item.date ? formatDate(item.date) : '');
+const dateText = item.displayDate || (item.date ? formatFn(item.date) : '');
 %>
 <article class="site-card">
   <% if (imagePath) { %>
   <a href="<%- imagePath %>" target="_blank" rel="noopener">
-    <img src="<%- imagePath %>" alt="<%= alt %>" loading="lazy">
-  <%
-  const formatFn = typeof formatDate === 'function' ? formatDate : (value) => value || '';
-  const sanitizeFn = typeof sanitizePath === 'function' ? sanitizePath : (value) => value;
-  const imagePath = item.image ? url_for(sanitizeFn(item.image)) : '';
-  const image4kPath = item.image4k ? url_for(sanitizeFn(item.image4k)) : null;
-  const sourceLink = item.link ? item.link : null;
-  const title = item.title || '每日壁纸';
-  const alt = item.alt || title;
-  const dateText = item.displayDate || (item.date ? formatFn(item.date) : '');
-  %>
+    <img src="<%- imagePath %>" alt="<%- alt %>" loading="lazy">
+  </a>
+  <% } %>
+  <div class="card-body">
+    <p class="card-title"><%- title %></p>
+    <% if (dateText) { %>
+    <p class="card-meta">拍摄日期：<%- dateText %></p>
+    <% } %>
+    <div class="card-actions">
+      <% if (imagePath) { %>
       <a class="button primary" href="<%- imagePath %>" download>下载原图</a>
       <% } %>
       <% if (image4kPath) { %>

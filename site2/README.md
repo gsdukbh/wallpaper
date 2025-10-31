@@ -1,6 +1,6 @@
 # Wallpaper Gallery (Hexo)
 
-该目录存放 Hexo 版本的 GitHub Pages 源码，目标与 `site/` 内的 Jekyll 方案一致：
+该目录存放 Hexo 版本的 GitHub Pages 源码：
 
 - 在主页突出展示最新壁纸
 - 按月分组的响应式图集

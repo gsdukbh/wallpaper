@@ -104,6 +104,25 @@ body {
   margin-bottom: 64px;
 }
 
+.history {
+  margin: 48px 0 80px;
+  display: grid;
+  gap: 32px;
+}
+
+#load-more-fallback[hidden] {
+  display: none;
+}
+
+#load-more-fallback {
+  justify-self: center;
+}
+
+#lazy-sentinel {
+  width: 100%;
+  height: 1px;
+}
+
 .month-section h2 {
   margin: 0 0 16px;
   font-size: 24px;
@@ -192,32 +211,28 @@ body {
 .archive-page {
   margin: 32px 0 64px;
   display: grid;
-  gap: 16px;
+  gap: 32px;
 }
 
-.archive-list {
-  padding: 0;
-  list-style: none;
+.archive-header {
   display: grid;
   gap: 12px;
+}
+
+.archive-gallery {
+  display: grid;
+  gap: 48px;
+}
+
+.year-section h2,
+.month-section h2 {
+  margin: 0 0 16px;
+  font-size: 24px;
+}
+
+.empty-hint {
   margin: 0;
-}
-
-.archive-list a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-  width: fit-content;
-}
-
-.archive-list a:hover {
-  background: rgba(37, 99, 235, 0.14);
+  color: #64748b;
 }
 
 @media (max-width: 720px) {

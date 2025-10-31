@@ -148,3 +148,4 @@ gradle-app.setting
 .settings/
 *.idea/
 .github/instructions/copilot-instructions.md.instructions.md
+site2/pnpm-lock.yaml

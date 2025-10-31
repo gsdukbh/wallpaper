@@ -18,18 +18,16 @@ const formatDate = (input) => {
 };
 
 const sanitizePath = (path) => {
-  if (!path) return null;
-  return path.startsWith('/') ? path : '/' + path;
+  if (!path) return '';
+  const trimmed = path.trim();
+  return trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
 };
 
 const normalizeFromData = (item) => {
   const clone = Object.assign({}, item);
   clone.date = clone.date || clone.endDate || clone.utcDate || '';
-  clone.image = clone.image || clone.path || '';
-  clone.image = clone.image.replace(/^\//, '');
-  if (clone.image4k) {
-    clone.image4k = clone.image4k.replace(/^\//, '');
-  }
+  clone.image = sanitizePath(clone.image || clone.path || '');
+  clone.image4k = sanitizePath(clone.image4k);
   clone.title = clone.title || clone.caption || clone.copyrightCN || clone.copyright || '每日壁纸';
   clone.alt = clone.alt || clone.title;
   clone.link = clone.link || clone.source;
@@ -52,8 +50,8 @@ if (!wallpapers.length) {
     const title = decodeURIComponent(titleRaw.replace(/[.-]/g, ' '));
     const fourKPath = file.path.replace('/bing_', '/4k_');
     return {
-      image: file.path,
-      image4k: staticMap.has(fourKPath) ? fourKPath : null,
+      image: sanitizePath(file.path),
+      image4k: staticMap.has(fourKPath) ? sanitizePath(fourKPath) : '',
       date: dateStr,
       displayDate: formatDate(dateStr),
       title,
@@ -63,23 +61,16 @@ if (!wallpapers.length) {
   });
 }
 
-wallpapers.sort((a, b) => {
-  const timeA = new Date(a.date || 0).getTime();
-  const timeB = new Date(b.date || 0).getTime();
-  return timeB - timeA;
-});
+wallpapers = wallpapers
+  .filter(item => item.image)
+  .sort((a, b) => {
+    const timeA = new Date(a.date || 0).getTime();
+    const timeB = new Date(b.date || 0).getTime();
+    return timeB - timeA;
+  });
 
 const latest = wallpapers.length ? wallpapers[0] : null;
-
-const monthGroups = wallpapers.reduce((acc, item) => {
-  const datePart = (item.date || '').toString();
-  const key = datePart.length >= 7 ? datePart.slice(0, 7) : 'unknown';
-  if (!acc[key]) acc[key] = [];
-  acc[key].push(item);
-  return acc;
-}, {});
-
-const sortedMonths = Object.keys(monthGroups).sort((a, b) => b.localeCompare(a));
+const remaining = wallpapers.slice(1);
 %>
 
 <% if (latest) { %>
@@ -96,17 +87,205 @@ const sortedMonths = Object.keys(monthGroups).sort((a, b) => b.localeCompare(a))
 </section>
 <% } %>
 
-<section class="gallery">
-  <% sortedMonths.forEach(function(monthKey) { %>
-    <% const items = monthGroups[monthKey]; %>
-    <% const displayMonth = monthKey === 'unknown' ? '未分组' : monthKey.replace('-', '年') + '月'; %>
-    <div class="month-section" id="month-<%= monthKey %>">
-      <h2><%= displayMonth %></h2>
-      <div class="wall-grid">
-        <% items.forEach(function(item) { %>
-          <%- partial('_partial/card', { item: item, formatDate: formatDate, sanitizePath: sanitizePath }) %>
-        <% }) %>
-      </div>
-    </div>
-  <% }) %>
+<section class="history">
+  <h2>历史壁纸</h2>
+  <div id="lazy-gallery" class="gallery"></div>
+  <button id="load-more-fallback" class="button secondary" hidden>加载更多</button>
+  <div id="lazy-sentinel" aria-hidden="true"></div>
+  <noscript>
+    <p>浏览器未启用 JavaScript，请前往 <a href="<%- url_for('/archive/') %>">存档页面</a> 查看全部壁纸。</p>
+  </noscript>
 </section>
+
+<script type="application/json" id="wallpapers-data">
+<%- JSON.stringify({
+  root: config.root || '/',
+  items: remaining.map(item => ({
+    image: item.image,
+    image4k: item.image4k,
+    title: item.title,
+    alt: item.alt,
+    date: item.date,
+    displayDate: item.displayDate,
+    link: item.link
+  }))
+}) %>
+</script>
+
+<script>
+(() => {
+  const dataElement = document.getElementById('wallpapers-data');
+  const payload = dataElement ? JSON.parse(dataElement.textContent || '{}') : {};
+  if (dataElement) {
+    dataElement.remove();
+  }
+
+  const root = typeof payload.root === 'string' && payload.root.length ? payload.root : '/';
+  const galleryData = Array.isArray(payload.items) ? payload.items : [];
+
+  const gallery = document.getElementById('lazy-gallery');
+  const sentinel = document.getElementById('lazy-sentinel');
+  const fallback = document.getElementById('load-more-fallback');
+
+  if (!gallery || !sentinel || !galleryData.length) {
+    if (sentinel) sentinel.remove();
+    if (fallback) fallback.remove();
+    return;
+  }
+
+  const chunkSize = 12;
+  let cursor = 0;
+  const monthCache = new Map();
+
+  const resolvePath = (path) => {
+    if (!path) return null;
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith('/')) return path;
+    const base = root.endsWith('/') ? root : `${root}/`;
+    return `${base}${path}`;
+  };
+
+  const formatMonthHeading = (key) => {
+    if (!key || key === 'unknown') return '未分组';
+    const [year, month] = key.split('-');
+    if (!year || !month) return '未分组';
+    return `${year}年${month}月`;
+  };
+
+  const ensureSection = (monthKey) => {
+    if (!monthCache.has(monthKey)) {
+      const section = document.createElement('div');
+      section.className = 'month-section';
+      section.id = `month-${monthKey}`;
+
+      const heading = document.createElement('h2');
+      heading.textContent = formatMonthHeading(monthKey);
+      section.appendChild(heading);
+
+      const grid = document.createElement('div');
+      grid.className = 'wall-grid';
+      section.appendChild(grid);
+
+      gallery.appendChild(section);
+      monthCache.set(monthKey, grid);
+    }
+    return monthCache.get(monthKey);
+  };
+
+  const createCard = (item) => {
+    const card = document.createElement('article');
+    card.className = 'site-card';
+
+    const imageUrl = resolvePath(item.image);
+    if (imageUrl) {
+      const anchor = document.createElement('a');
+      anchor.href = imageUrl;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener';
+
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.loading = 'lazy';
+      img.alt = item.alt || item.title || '每日壁纸';
+
+      anchor.appendChild(img);
+      card.appendChild(anchor);
+    }
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const title = document.createElement('p');
+    title.className = 'card-title';
+    title.textContent = item.title || '每日壁纸';
+    body.appendChild(title);
+
+    if (item.displayDate) {
+      const meta = document.createElement('p');
+      meta.className = 'card-meta';
+      meta.textContent = `拍摄日期：${item.displayDate}`;
+      body.appendChild(meta);
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+
+    if (imageUrl) {
+      const originalBtn = document.createElement('a');
+      originalBtn.className = 'button primary';
+      originalBtn.href = imageUrl;
+      originalBtn.download = '';
+      originalBtn.textContent = '下载原图';
+      actions.appendChild(originalBtn);
+    }
+
+    const image4kUrl = resolvePath(item.image4k);
+    if (image4kUrl) {
+      const btn4k = document.createElement('a');
+      btn4k.className = 'button secondary';
+      btn4k.href = image4kUrl;
+      btn4k.download = '';
+      btn4k.textContent = '下载 4K';
+      actions.appendChild(btn4k);
+    }
+
+    if (item.link) {
+      const sourceBtn = document.createElement('a');
+      sourceBtn.className = 'button secondary';
+      sourceBtn.href = item.link;
+      sourceBtn.target = '_blank';
+      sourceBtn.rel = 'noopener';
+      sourceBtn.textContent = '查看来源';
+      actions.appendChild(sourceBtn);
+    }
+
+    if (actions.childNodes.length) {
+      body.appendChild(actions);
+    }
+
+    card.appendChild(body);
+    return card;
+  };
+
+  const loadChunk = () => {
+    let loaded = 0;
+    while (cursor < galleryData.length && loaded < chunkSize) {
+      const item = galleryData[cursor++];
+      const monthKey = (item.date || '').toString().slice(0, 7) || 'unknown';
+      const grid = ensureSection(monthKey);
+      grid.appendChild(createCard(item));
+      loaded += 1;
+    }
+
+    if (cursor >= galleryData.length) {
+      if (observer) observer.disconnect();
+      sentinel.remove();
+      if (fallback) fallback.remove();
+    }
+  };
+
+  const observer = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadChunk();
+          }
+        });
+      }, { rootMargin: '0px 0px 200px 0px' })
+    : null;
+
+  if (observer) {
+    observer.observe(sentinel);
+  } else if (fallback) {
+    fallback.hidden = false;
+    fallback.addEventListener('click', () => {
+      loadChunk();
+      if (cursor >= galleryData.length) {
+        fallback.remove();
+      }
+    });
+  }
+
+  loadChunk();
+})();
+</script>

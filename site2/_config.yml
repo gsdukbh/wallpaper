@@ -3,7 +3,7 @@ subtitle: "Bing 壁纸图集"
 description: "每日自动更新的 Bing 壁纸展示"
 author: "gsdukbh"
 language: zh-CN
-url: https://gsdukbh.github.io
+url: https://gsdukbh.github.io/wallpaper
 root: /
 theme: wallpaper
 source_dir: source

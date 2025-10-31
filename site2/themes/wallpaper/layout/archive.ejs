@@ -1,14 +1,129 @@
+<%
+const formatDate = (input) => {
+  if (!input) return '';
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) {
+    if (typeof input === 'string') {
+      if (/^\d{8}$/.test(input)) return `${input.slice(0, 4)}年${input.slice(4, 6)}月${input.slice(6)}日`;
+      if (input.length === 10) {
+        const [y, m, d] = input.split(/[-/]/);
+        if (y && m && d) return `${y}年${m}月${d}日`;
+      }
+    }
+    return input;
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}年${month}月${day}日`;
+};
+
+const sanitizePath = (value) => {
+  if (!value) return '';
+  const trimmed = value.trim();
+  return trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+};
+
+const normalize = (item) => {
+  const clone = Object.assign({}, item);
+  clone.date = clone.date || clone.endDate || clone.utcDate || '';
+  clone.image = sanitizePath(clone.image || clone.path || '');
+  clone.image4k = sanitizePath(clone.image4k);
+  clone.title = clone.title || clone.caption || clone.copyrightCN || clone.copyright || '每日壁纸';
+  clone.alt = clone.alt || clone.title;
+  clone.link = clone.link || clone.source;
+  clone.displayDate = formatDate(clone.date);
+  return clone;
+};
+
+const fallbackFromStatic = () => {
+  const files = (site.static_files || []).filter(file => file.path && file.path.startsWith('images/') && file.path.includes('bing_'));
+  const staticMap = new Map((site.static_files || []).map(file => [file.path, true]));
+  return files.map(file => {
+    const name = file.path.split('/').pop();
+    const parts = name.split('_');
+    const dateValue = parts[1] || '';
+    const titleRaw = parts.slice(2).join('_').replace(/\.(jpg|jpeg|png)$/i, '');
+    const title = decodeURIComponent(titleRaw.replace(/[.-]/g, ' '));
+    const fourKPath = file.path.replace('/bing_', '/4k_');
+    return normalize({
+      image: file.path,
+      image4k: staticMap.has(fourKPath) ? fourKPath : '',
+      date: dateValue,
+      title,
+      alt: title
+    });
+  });
+};
+
+const yearKey = (value) => {
+  if (!value) return 'unknown';
+  if (/^\d{4}$/.test(value)) return value;
+  if (/^\d{8}$/.test(value)) return value.slice(0, 4);
+  if (typeof value === 'string') {
+    const match = value.match(/(19|20)\d{2}/);
+    if (match) return match[0];
+  }
+  const time = new Date(value).getFullYear();
+  return Number.isNaN(time) ? 'unknown' : String(time);
+};
+
+const wallpapersSource = Array.isArray(site.data.wallpapers) ? site.data.wallpapers.filter(Boolean).map(normalize) : fallbackFromStatic();
+const wallpapers = wallpapersSource
+  .filter(item => item.image)
+  .sort((a, b) => {
+    const timeA = new Date(a.date || 0).getTime();
+    const timeB = new Date(b.date || 0).getTime();
+    return timeB - timeA;
+  });
+
+const grouped = new Map();
+wallpapers.forEach((item) => {
+  const key = yearKey(item.date);
+  if (!grouped.has(key)) grouped.set(key, []);
+  grouped.get(key).push(item);
+});
+
+grouped.forEach((items, key) => {
+  items.sort((a, b) => {
+    const timeA = new Date(a.date || 0).getTime();
+    const timeB = new Date(b.date || 0).getTime();
+    return timeB - timeA;
+  });
+});
+
+const years = Array.from(grouped.keys()).sort((a, b) => {
+  if (a === 'unknown') return 1;
+  if (b === 'unknown') return -1;
+  return Number(b) - Number(a);
+});
+
+const yearHeading = (value) => {
+  if (!value || value === 'unknown') return '未分组';
+  return `${value} 年`;
+};
+%>
+
 <section class="archive-page">
-  <h2>按年份浏览历史壁纸</h2>
-  <p>以下链接会跳转至保存在仓库中的年度 Markdown 存档。</p>
-  <ul class="archive-list">
-    <%
-    const archiveFiles = (site.static_files || []).filter(file => file.path && file.path.startsWith('archive/') && file.path.endsWith('.md'));
-    archiveFiles.sort((a, b) => b.path.localeCompare(a.path));
-    archiveFiles.forEach(function(file) {
-      const year = file.path.replace('archive/', '').replace('.md', '');
-    %>
-      <li><a href="<%- url_for('/' + file.path) %>"><%= year %> 年</a></li>
+  <header class="archive-header">
+    <h2>按年份浏览历史壁纸</h2>
+    <p>按照年份分组展示全部壁纸，可直接在此页面浏览与下载。</p>
+  </header>
+
+  <% if (!wallpapers.length) { %>
+  <p class="empty-hint">暂未找到壁纸数据，请稍后再试。</p>
+  <% } else { %>
+  <div class="archive-gallery">
+    <% years.forEach((year) => { %>
+    <section class="year-section" id="year-<%- year %>">
+      <h2><%- yearHeading(year) %></h2>
+      <div class="wall-grid">
+        <% grouped.get(year).forEach((item) => { %>
+        <%- partial('_partial/card', { item, formatDate, sanitizePath }) %>
+        <% }) %>
+      </div>
+    </section>
     <% }) %>
-  </ul>
+  </div>
+  <% } %>
 </section>
