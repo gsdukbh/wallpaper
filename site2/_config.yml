@@ -3,8 +3,8 @@ subtitle: "Bing 壁纸图集"
 description: "每日自动更新的 Bing 壁纸展示"
 author: "gsdukbh"
 language: zh-CN
-url: https://gsdukbh.github.io/wallpaper
-root: /
+url: http://werls.top/wallpaper/
+root: /wallpaper
 theme: wallpaper
 source_dir: source
 public_dir: public
