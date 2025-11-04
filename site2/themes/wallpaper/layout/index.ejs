@@ -289,3 +289,57 @@ const remaining = wallpapers.slice(1);
   loadChunk();
 })();
 </script>
+
+<script>
+// 在初次渲染时将“今日推荐”图片高度设置为页面中剩余可视高度（视口高度 - 图片顶部到视口顶部的距离 - 预留间距）
+(() => {
+  const setHeroImgHeight = () => {
+    const img = document.querySelector('.hero .site-card img');
+    if (!img) return;
+    const vH = (window.visualViewport && window.visualViewport.height)
+      || window.innerHeight
+      || document.documentElement.clientHeight
+      || document.body.clientHeight
+      || 0;
+    const rect = img.getBoundingClientRect();
+    // 预留一点底部空间，避免贴边；可按需调整
+    const spacing = 16;
+    let remaining = Math.floor(vH - rect.top - spacing);
+    if (!Number.isFinite(remaining)) return;
+    // 设定下限，防止过小
+    if (remaining < 240) remaining = 240;
+    img.style.height = `${remaining}px`;
+    img.style.objectFit = 'cover';
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setHeroImgHeight, { once: true });
+  } else {
+    setHeroImgHeight();
+  }
+
+  // 监听窗口尺寸变化，避免反复触发布局抖动（节流）
+  let ticking = false;
+  window.addEventListener('resize', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      setHeroImgHeight();
+      ticking = false;
+    });
+  });
+
+  // 监听视觉视口变化（iOS/Safari 地址栏收起/展开）
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      setHeroImgHeight();
+    });
+  }
+
+  // 首图加载完成后再校准一次，避免图片占位影响滚动条并改变 rect.top
+  const img = document.querySelector('.hero .site-card img');
+  if (img && !img.complete) {
+    img.addEventListener('load', setHeroImgHeight, { once: true });
+  }
+})();
+</script>

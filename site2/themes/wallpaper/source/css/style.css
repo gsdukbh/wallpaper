@@ -93,6 +93,14 @@ body {
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
 }
 
+/* 让首页“今日推荐”卡片的图片在加载后占满可视高度 */
+.hero .site-card img {
+  /* 交由 JS 在运行时精确设置高度，CSS 提供合理的无脚本回退 */
+  height: auto;
+  min-height: clamp(240px, 60vh, 1000px);
+  object-fit: cover;
+}
+
 .hero h2 {
   margin: 0;
   font-size: 32px;

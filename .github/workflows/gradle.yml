@@ -74,6 +74,7 @@ jobs:
           git add *.md
           git add *.db
           git add archive/*.md
+          git add site2/source/_data/wallpapers.json
           git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -111,6 +112,7 @@ jobs:
           git add *.md
           git add *.db
           git add archive/*.md
+          git add site2/source/_data/wallpapers.json
           git commit -m "auto update wallpaper"
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -184,7 +186,7 @@ jobs:
       #     rsync -a --delete images/ site2/source/images/
       - name: Build Hexo site
         working-directory: site2
-        run: npm run build
+        run: npm run build 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
