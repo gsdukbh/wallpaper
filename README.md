@@ -4,14 +4,15 @@
 bing wallpaper 4k download
 
 ### 今天 today :
-![劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](images/bing_2026-01-03_OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg) [劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](https://cn.bing.com/th?id=OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg) 2026-01-03
+![国王山, 楚加奇山脉, 阿拉斯加, 美国 (© Chris Moore - Exploring Light Photography/TANDEM Stills + Motion)](images/bing_2026-01-04_OHR.KingMountain_ZH-CN0397508222_UHD.jpg) [国王山, 楚加奇山脉, 阿拉斯加, 美国 (© Chris Moore - Exploring Light Photography/TANDEM Stills + Motion)](https://cn.bing.com/th?id=OHR.KingMountain_ZH-CN0397508222_UHD.jpg) 2026-01-04
 
 ### 2026-01
 
 |     |    |
 | ---- | ---- |
- |![劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](images/bing_2026-01-03_OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg) [劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](https://cn.bing.com/th?id=OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-03 |![威尼斯鸟瞰图, 意大利 (© Clement Leonard/Getty Images)](images/bing_2026-01-02_OHR.VeniceView_ZH-CN3088407995_UHD.jpg) [威尼斯鸟瞰图, 意大利 (© Clement Leonard/Getty Images)](https://cn.bing.com/th?id=OHR.VeniceView_ZH-CN3088407995_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-02|
- |![正在睡觉的北极狐 (© Chansak Joe/Getty Images)](images/bing_2026-01-01_OHR.NewYearFox_ZH-CN9312618796_UHD.jpg) [正在睡觉的北极狐 (© Chansak Joe/Getty Images)](https://cn.bing.com/th?id=OHR.NewYearFox_ZH-CN9312618796_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-01|
+ |![国王山, 楚加奇山脉, 阿拉斯加, 美国 (© Chris Moore - Exploring Light Photography/TANDEM Stills + Motion)](images/bing_2026-01-04_OHR.KingMountain_ZH-CN0397508222_UHD.jpg) [国王山, 楚加奇山脉, 阿拉斯加, 美国 (© Chris Moore - Exploring Light Photography/TANDEM Stills + Motion)](https://cn.bing.com/th?id=OHR.KingMountain_ZH-CN0397508222_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-04 |![劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](images/bing_2026-01-03_OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg) [劳特布隆嫩的施陶巴赫瀑布, 伯尔尼州, 瑞士 (© pongnathee kluaythong/Getty Images)](https://cn.bing.com/th?id=OHR.LauterbrunnenValley_ZH-CN0118001217_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-03|
+ |![威尼斯鸟瞰图, 意大利 (© Clement Leonard/Getty Images)](images/bing_2026-01-02_OHR.VeniceView_ZH-CN3088407995_UHD.jpg) [威尼斯鸟瞰图, 意大利 (© Clement Leonard/Getty Images)](https://cn.bing.com/th?id=OHR.VeniceView_ZH-CN3088407995_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-02 |![正在睡觉的北极狐 (© Chansak Joe/Getty Images)](images/bing_2026-01-01_OHR.NewYearFox_ZH-CN9312618796_UHD.jpg) [正在睡觉的北极狐 (© Chansak Joe/Getty Images)](https://cn.bing.com/th?id=OHR.NewYearFox_ZH-CN9312618796_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp&w=3840&h=2160&rs=1&c=4) 2026-01-01|
+
 ### 存档 archive :
 [2021.md](archive/2021.md) 
 
