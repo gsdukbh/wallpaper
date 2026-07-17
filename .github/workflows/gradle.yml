@@ -164,7 +164,7 @@ jobs:
       - build-on-self-hosted
       - fallback-on-self-hosted-failure
     if: ${{ always() && (needs.build-on-github.result == 'success' || needs.build-on-self-hosted.result == 'success' || needs.fallback-on-self-hosted-failure.result == 'success') }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
