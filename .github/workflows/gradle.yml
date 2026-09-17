@@ -193,4 +193,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: site2/public
+          force_orphan: true
           commit_message: "chore: update hexo site"
